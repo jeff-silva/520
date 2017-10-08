@@ -1,2 +1,3 @@
+- Melhoria do gerenciador de post types;
 - Implementação do gerenciador de post types;
 - Melhoria do gerenciador de projetos;

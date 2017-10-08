@@ -112,6 +112,17 @@ class Posttypes extends \Db
 	}
 
 
+	public function taxonomies()
+	{
+		$taxonomies = get_option('520-taxonomies');
+		$taxonomies = is_array($taxonomies)? $taxonomies: array();
+		foreach(get_taxonomies() as $taxo) {
+			$taxonomies[] = $taxo;
+		}
+		return $taxonomies;
+	}
+
+
 	public function dashicons()
 	{
 		return array(

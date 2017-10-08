@@ -187,7 +187,7 @@ add_action('admin_menu', function() {
 
 	if (isset($_GET['cdz_module_toggle'])) {
 		cdz_module_toggle($_GET['cdz_module_toggle']);
-		wp_redirect($_SERVER['HTTP_REFERER']); die;
+		echo "<meta http-equiv='refresh' content='0;url={$_SERVER['HTTP_REFERER']}'>"; die;
 	}
 
 	?>
@@ -217,6 +217,8 @@ add_action('admin_menu', function() {
 		</li>
 		<?php endforeach; ?>
 	</ul>
+
+	<pre><?php include __DIR__ . '/info.txt'; ?></pre>
 	<?php }, 'dashicons-admin-users', 1);
 });
 
