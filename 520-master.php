@@ -1,11 +1,11 @@
 <?php
 /*
-	Plugin Name: 520 Utilities
-	Plugin URI: 
-	Description: Plugin multi utilidades 520: Gerenciador de projetos, Gerenciador de post types;
-	Version: 0.0.2
-	Author: Jeferson Siqueira
-	Author URI: http://jsiqueira.com
+	Plugin Name: Midia 520 - Gerenciamento
+	Plugin URI: -
+	Description: Gerenciamento empresarial da Midia 520
+	Version: 1.1.4
+	Author: ARI Soft
+	Author URI: http://www.ari-soft.com
 	Text Domain: 520
 	Domain Path: /languages
 	License: GPL2
@@ -103,8 +103,11 @@ function cdz_module_toggle($name) {
 
 
 function cdz_update() {
-	$zip = file_get_contents('https://github.com/jeff-silva/520/archive/master.zip');
-	file_put_contents('download.zip', $zip);
+	include __DIR__ . '/libs/PclZip.php';
+	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
+	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
+	$zip = new PclZip('download.zip');
+	return $zip->extract(PCLZIP_OPT_REPLACE_NEWER, PCLZIP_OPT_PATH, dirname(__DIR__));
 }
 
 
@@ -218,14 +221,19 @@ add_action('admin_menu', function() {
 });
 
 
+
+/* Update */
+
+add_action("wp_ajax_520-update", function() {
+	print_r(cdz_update()); die;
+});
+
 add_action('admin_footer', function() { ?>
 <script>
 jQuery(document).ready(function($) {
 	$.get("https://raw.githubusercontent.com/jeff-silva/520/master/info.json", function(there) {
 		$.get("<?php echo plugins_url('520-master'); ?>/info.json", function(here) {
-			if(there.version != here.version) {
-				alert("Atualizar");
-			}
+			if(there.version != here.version) $.get("<?php echo admin_url("admin-ajax.php?action=520-update"); ?>");
 		}, "json");
 	}, "json");
 });
