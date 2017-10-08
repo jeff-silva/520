@@ -225,11 +225,12 @@ add_action('admin_menu', function() {
 /* Update */
 function cdz_update() {
 	include __DIR__ . '/libs/PclZip.php';
-	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
-	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip?rand='.rand(0,9999), 'r'));
-	$zip = new PclZip('download.zip');
-	$return = $zip->extract(PCLZIP_OPT_REPLACE_NEWER, PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
-	// unlink(__DIR__ . '/download.zip');
+	$zip_download = __DIR__ . '/download.zip';
+	if (file_exists($zip_download)) unlink($zip_download);
+	copy('https://github.com/jeff-silva/520/archive/master.zip?rand='.rand(0,9999), $zip_download);
+	$zip = new PclZip($zip_download);
+	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
+	unlink($zip_download);
 	return $return;
 }
 
