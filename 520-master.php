@@ -225,7 +225,7 @@ add_action('admin_menu', function() {
 /* Update */
 
 add_action("wp_ajax_520-update", function() {
-	print_r(cdz_update()); die;
+	echo json_encode(cdz_update()); die;
 });
 
 add_action('admin_footer', function() { $rand=rand(0,9999); ?>
