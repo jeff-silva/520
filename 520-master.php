@@ -102,14 +102,6 @@ function cdz_module_toggle($name) {
 }
 
 
-function cdz_update() {
-	include __DIR__ . '/libs/PclZip.php';
-	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
-	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
-	$zip = new PclZip('download.zip');
-	return $zip->extract(PCLZIP_OPT_REPLACE_NEWER, PCLZIP_OPT_PATH, dirname(__DIR__));
-}
-
 
 foreach(cdz_modules() as $mod) {
 	if ($mod['active']) include $mod['init'];
@@ -200,8 +192,16 @@ add_action('admin_menu', function() {
 
 	?>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
+	
 
 	<br>
+	<div class="text-right">
+		<a href="<?php echo admin_url("admin-ajax.php?action=520-update"); ?>" class="btn btn-xs btn-default" target="_blank">
+			<i class="fa fa-fw fa-refresh"></i> Update core
+		</a>
+	</div>
+	<br>
+
 	<ul class="list-group">
 		<?php foreach(cdz_modules() as $mod): ?>
 		<li class="list-group-item">
@@ -223,10 +223,21 @@ add_action('admin_menu', function() {
 
 
 /* Update */
+function cdz_update() {
+	include __DIR__ . '/libs/PclZip.php';
+	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
+	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip?rand='.rand(0,9999), 'r'));
+	$zip = new PclZip('download.zip');
+	$return = $zip->extract(PCLZIP_OPT_REPLACE_NEWER, PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
+	// unlink(__DIR__ . '/download.zip');
+	return $return;
+}
+
 
 add_action("wp_ajax_520-update", function() {
 	echo json_encode(cdz_update()); die;
 });
+
 
 add_action('admin_footer', function() { $rand=rand(0,9999); ?>
 <script>
