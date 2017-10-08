@@ -102,6 +102,12 @@ function cdz_module_toggle($name) {
 }
 
 
+function cdz_update() {
+	$zip = file_get_contents('https://github.com/jeff-silva/520/archive/master.zip');
+	file_put_contents('download.zip', $zip);
+}
+
+
 foreach(cdz_modules() as $mod) {
 	if ($mod['active']) include $mod['init'];
 }
@@ -210,3 +216,18 @@ add_action('admin_menu', function() {
 	</ul>
 	<?php }, 'dashicons-admin-users', 1);
 });
+
+
+add_action('admin_footer', function() { ?>
+<script>
+jQuery(document).ready(function($) {
+	$.get("https://raw.githubusercontent.com/jeff-silva/520/master/info.json", function(there) {
+		$.get("<?php echo plugins_url('520'); ?>/info.json", function(here) {
+			if(there.version != here.version) {
+				alert("Atualizar");
+			}
+		}, "json");
+	}, "json");
+});
+</script>
+<?php });
