@@ -229,7 +229,7 @@ function cdz_update() {
 	if (file_exists($zip_download)) unlink($zip_download);
 	copy('https://github.com/jeff-silva/520/archive/master.zip?rand='.rand(0,9999), $zip_download);
 	$zip = new PclZip($zip_download);
-	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
+	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 	unlink($zip_download);
 	return $return;
 }
