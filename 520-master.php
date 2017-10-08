@@ -1,11 +1,11 @@
 <?php
 /*
-	Plugin Name: Midia 520 - Gerenciamento
-	Plugin URI: -
-	Description: Gerenciamento empresarial da Midia 520
-	Version: 1.1.4
-	Author: ARI Soft
-	Author URI: http://www.ari-soft.com
+	Plugin Name: 520 Utilities
+	Plugin URI: 
+	Description: Plugin multi utilidades 520: Gerenciador de projetos, Gerenciador de post types;
+	Version: 0.0.2
+	Author: Jeferson Siqueira
+	Author URI: http://jsiqueira.com
 	Text Domain: 520
 	Domain Path: /languages
 	License: GPL2
