@@ -1,0 +1,16 @@
+/* <input type="range" class="form-control"> */
+input[type=range] {-webkit-appearance: none; width: 100% !important; box-shadow: none !important; border:none !important;}
+input[type=range]:focus {outline: none !important;}
+input[type=range]::-webkit-slider-runnable-track {width: 100%; height: 4px; cursor: pointer; background: #a6d8ff;}
+input[type=range]::-moz-range-track {height: 16px; width: 16px; border-radius: 3px; background: #2196f3; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border-radius:50%;}
+input[type=range]::-moz-range-thumb {height: 16px; width: 16px; border-radius: 3px; background: #2196f3; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border-radius:50%;}
+input[type=range]::-ms-track {height: 16px; width: 16px; border-radius: 3px; background: #2196f3; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border-radius:50%;}
+input[type=range]::-webkit-slider-thumb {height: 16px; width: 16px; border-radius: 3px; background: #2196f3; cursor: pointer; -webkit-appearance: none; margin-top: -6px; border-radius:50%;}
+.input-group-range .input-group-addon {background:none!important; border:none; color:inherit}
+
+/* <input type="radio" class="form-control"> | <input type="checkbox" class="form-control"> */
+input[type=radio].form-control, input[type=checkbox].form-control {-webkit-appearance:none; -moz-appearance:none; appearance:none; position:relative; display:inline-block!important; vertical-align:bottom; width:22px; height:22px; border:solid 4px #a6d8ff; outline:none!important; cursor:pointer;}
+input[type=radio].form-control {border-radius:50%;}
+input[type=checkbox].form-control:after, input[type=radio].form-control:after {content:""; position:absolute; top:6px; left:6px; width:0px; height:0px; background:#2196f3 !important; transition: all 200ms cubic-bezier(1.000, 0.960, 0.000, 0.785);}
+input[type=radio].form-control:after {border-radius:50%;}
+input[type=checkbox].form-control:checked:after, input[type=radio].form-control:checked:after {width:10px; height:10px; top:2px; left:2px;}
