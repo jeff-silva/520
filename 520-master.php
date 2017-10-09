@@ -183,43 +183,49 @@ add_action('init', function() {
 
 /* Gerenciador de módulos 520 */
 add_action('admin_menu', function() {
-	add_menu_page('520 Modulos', '520 Modulos', 'manage_options', '520_modules', function() {
 
-	if (isset($_GET['cdz_module_toggle'])) {
-		cdz_module_toggle($_GET['cdz_module_toggle']);
-		echo "<meta http-equiv='refresh' content='0;url={$_SERVER['HTTP_REFERER']}'>"; die;
+	$user = wp_get_current_user();
+
+	if ($user->ID==1) {
+		add_menu_page('520 Modulos', '520 Modulos', 'manage_options', '520_modules', function() {
+
+		if (isset($_GET['cdz_module_toggle'])) {
+			cdz_module_toggle($_GET['cdz_module_toggle']);
+			echo "<meta http-equiv='refresh' content='0;url={$_SERVER['HTTP_REFERER']}'>"; die;
+		}
+
+		?>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
+		
+
+		<br>
+		<div class="text-right">
+			<a href="<?php echo admin_url("admin-ajax.php?action=520-update"); ?>" class="btn btn-xs btn-default" target="_blank">
+				<i class="fa fa-fw fa-refresh"></i> Update core
+			</a>
+		</div>
+		<br>
+
+		<ul class="list-group">
+			<?php foreach(cdz_modules() as $mod): ?>
+			<li class="list-group-item">
+				<div class="row">
+					<div class="col-xs-6"><?php echo $mod['basename']; ?></div>
+					<div class="col-xs-6 text-right">
+						<a href="admin.php?page=520_modules&cdz_module_toggle=<?php echo $mod['basename']; ?>">
+							<?php if ($mod['active']==1): ?>Desativar
+							<?php else: ?>Ativar<?php endif; ?>
+						</a>
+					</div>
+				</div>
+			</li>
+			<?php endforeach; ?>
+		</ul>
+
+		<pre><?php include __DIR__ . '/info.txt'; ?></pre>
+		<?php }, 'dashicons-admin-users', 1);
 	}
 
-	?>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
-	
-
-	<br>
-	<div class="text-right">
-		<a href="<?php echo admin_url("admin-ajax.php?action=520-update"); ?>" class="btn btn-xs btn-default" target="_blank">
-			<i class="fa fa-fw fa-refresh"></i> Update core
-		</a>
-	</div>
-	<br>
-
-	<ul class="list-group">
-		<?php foreach(cdz_modules() as $mod): ?>
-		<li class="list-group-item">
-			<div class="row">
-				<div class="col-xs-6"><?php echo $mod['basename']; ?></div>
-				<div class="col-xs-6 text-right">
-					<a href="admin.php?page=520_modules&cdz_module_toggle=<?php echo $mod['basename']; ?>">
-						<?php if ($mod['active']==1): ?>Desativar
-						<?php else: ?>Ativar<?php endif; ?>
-					</a>
-				</div>
-			</div>
-		</li>
-		<?php endforeach; ?>
-	</ul>
-
-	<pre><?php include __DIR__ . '/info.txt'; ?></pre>
-	<?php }, 'dashicons-admin-users', 1);
 });
 
 
