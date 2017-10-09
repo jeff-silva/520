@@ -247,16 +247,20 @@ add_action("wp_ajax_520-update", function() {
 });
 
 
-add_action('admin_footer', function() { $rand=rand(0,9999); ?>
-<script>
-jQuery(document).ready(function($) {
-	$.get("https://raw.githubusercontent.com/jeff-silva/520/master/info.json?rand=<?php echo $rand; ?>", function(there) {
-		$.get("<?php echo plugins_url('520-master'); ?>/info.json?rand=<?php echo $rand; ?>", function(here) {
-			if(there.version != here.version) {
-				$.get("<?php echo admin_url("admin-ajax.php?action=520-update"); ?>");
-			}
+$ignores = array('jsiqueira.com');
+if (! in_array($_SERVER['HTTP_HOST'], $ignores)) {
+	add_action('admin_footer', function() { $rand=rand(0,9999); ?>
+	<script>
+	jQuery(document).ready(function($) {
+		$.get("https://raw.githubusercontent.com/jeff-silva/520/master/info.json?rand=<?php echo $rand; ?>", function(there) {
+			$.get("<?php echo plugins_url('520-master'); ?>/info.json?rand=<?php echo $rand; ?>", function(here) {
+				if(there.version != here.version) {
+					$.get("<?php echo admin_url("admin-ajax.php?action=520-update"); ?>");
+				}
+			}, "json");
 		}, "json");
-	}, "json");
-});
-</script>
-<?php });
+	});
+	</script>
+	<?php });
+}
+

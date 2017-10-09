@@ -89,6 +89,9 @@
 							<li role="presentation">
 								<a href="#modal-posttype-info" role="tab" data-toggle="tab">Info</a>
 							</li>
+							<li role="presentation">
+								<a href="#modal-posttype-fieldgroups" role="tab" data-toggle="tab">Campos</a>
+							</li>
 						</ul>
 						<br>
 					
@@ -96,11 +99,11 @@
 						<div class="tab-content">
 							<div role="tabpanel" class="tab-pane active" id="modal-posttype-basic">
 								<div class="row">
-									<div class="col-xs-12 form-group">
+									<div class="col-xs-6 form-group">
 										<label>post_type</label>
-										<input type="text" v-model="posttypeEdit.post_type" class="form-control">
+										<div class="form-control" disabled>{{ posttypeEdit.post_type }}</div>
 									</div>
-									<div class="col-xs-12 form-group">
+									<div class="col-xs-6 form-group">
 										<label>label</label>
 										<input type="text" v-model="posttypeEdit.post_type_args.label" class="form-control">
 									</div>
@@ -323,6 +326,22 @@
 									</div>
 								</div>
 							</div>
+
+							<div role="tabpanel" class="tab-pane" id="modal-posttype-fieldgroups">
+								<div class="text-right">
+									<a href="javascript:;" class="btn btn-xs btn-primary" @click="_posttypeFieldgroupAdd(posttypeEdit);">
+										<i class="fa fa-plus"></i> Add grupo
+									</a>
+								</div>
+								<hr>
+								<div class="panel panel-default" v-for="group in posttypeEdit.posttype_fieldgroups">
+									<div class="panel-heading">{{ group.name || 'Grupo' }}</div>
+									<div class="panel-body">
+										<input type="text" v-model="group.name" class="form-control">
+										<pre>{{ group }}</pre>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -335,7 +354,7 @@
 	</div>
 	<!-- edit posttype -->
 
-	<pre>{{ $data|json }}</pre>
+	<!-- <pre>{{ $data|json }}</pre> -->
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
@@ -396,9 +415,18 @@ var app = new Vue({
 				app.error = response.error;
 				if (response.success) {
 					$("#modal-posttype").modal('hide');
-					app._posttypeSearch();
+					app.posttypes = response.success;
 				}
 			}, "json");
+		},
+
+
+		_posttypeFieldgroupAdd: function(posttype) {
+			var app=this, $=jQuery;
+			posttype.posttype_fieldgroups.push({
+				name: null,
+				fields: [],
+			});
 		},
 	},
 	mounted: function() {},

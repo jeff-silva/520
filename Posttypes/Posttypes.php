@@ -18,6 +18,14 @@ class Posttypes extends \Db
 	}
 
 
+	public function apiPosttypeUpdate()
+	{
+		$posttypes = isset($_REQUEST['posttypes'])? $_REQUEST['posttypes']: array();
+		$posttypes = is_array($posttypes)? $posttypes: array();
+		return $this->posttypeUpdate($posttypes);
+	}
+
+
 
 	public function add($post_type, $singular, $plural)
 	{
@@ -34,6 +42,39 @@ class Posttypes extends \Db
 		}
 
 		$posttypes[] = $this->createDefault($post_type, $singular, $plural);
+		update_option('520-posttypes', $posttypes, true);
+		return $posttypes;
+	}
+
+
+
+	public function posttypeUpdate($posttypes)
+	{
+		$taxonomies = $this->taxonomies();
+
+		$posttypes = is_array($posttypes)? $posttypes: array();
+		foreach($posttypes as $i=>$posttype) {
+			foreach($posttype['post_type_args'] as $arg=>$val) {
+				if ($val=='true') $posttype['post_type_args'][$arg] = true;
+				else if ($val=='false') $posttype['post_type_args'][$arg] = false;
+				else if ($val=='') $posttype['post_type_args'][$arg] = null;
+			}
+
+			$posttype['post_type_args']['taxonomies'] = isset($posttype['post_type_args']['taxonomies'])? $posttype['post_type_args']['taxonomies']: array();
+			$posttype['post_type_args']['taxonomies'] = is_array($posttype['post_type_args']['taxonomies'])? $posttype['post_type_args']['taxonomies']: array();
+
+			$posttype['post_type_args']['menu_position'] = intval($posttype['post_type_args']['menu_position']);
+
+			// posttype_fieldgroups
+			$posttype['posttype_fieldgroups'] = isset($posttype['posttype_fieldgroups'])? $posttype['posttype_fieldgroups']: array();
+			foreach($posttype['posttype_fieldgroups'] as $ii=>$fieldgroup) {
+				$fieldgroup['name'] = isset($fieldgroup['name'])? $fieldgroup['name']: 'Grupo';
+				$fieldgroup['fields'] = isset($fieldgroup['fields'])? $fieldgroup['fields']: array();
+				$posttype['posttype_fieldgroups'][$ii] = $fieldgroup;
+			}
+
+			$posttypes[$i] = $posttype;
+		}
 		update_option('520-posttypes', $posttypes, true);
 		return $posttypes;
 	}

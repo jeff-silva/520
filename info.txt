@@ -1,3 +1,7 @@
+0.0.6
+- Bugfix no gerenciador de post types;
+
+0.0.5
 - Melhoria do gerenciador de post types;
 - Implementação do gerenciador de post types;
 - Melhoria do gerenciador de projetos;
