@@ -6,6 +6,7 @@
 	Version: 1.1.4
 	Author: ARI Soft
 	Author URI: http://www.ari-soft.com
+	Depends: loco-translate, w3-total-cache, wordpress-seo, google-analytics-dashboard-for-wp
 	Text Domain: 520
 	Domain Path: /languages
 	License: GPL2
@@ -104,6 +105,22 @@ function cdz_module_toggle($name) {
 
 
 
+/* Update */
+function cdz_update() {
+	include __DIR__ . '/libs/PclZip.php';
+	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
+	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
+	$zip = new PclZip(__DIR__ . '/download.zip');
+	$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
+}
+
+
+function cdz_header() { ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<?php }
+
+
 foreach(cdz_modules() as $mod) {
 	if ($mod['active']) include $mod['init'];
 }
@@ -113,13 +130,83 @@ add_action('wp_login', function() {
 	$json1 = json_decode(file_get_contents(__DIR__ . '/info.json'), true);
 	$json2 = json_decode(file_get_contents('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
 	if ($json1['version'] != $json2['version']) {
-		include __DIR__ . '/libs/PclZip.php';
-		if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
-		file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
-		$zip = new PclZip(__DIR__ . '/download.zip');
-		$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
+		cdz_update();
 	}
 });
+
+
+add_action('admin_menu', function() {
+	add_submenu_page('options-general.php', '520 Settings', '520 Settings', 'manage_options', '520-settings', function() {
+		include __DIR__ . '/views/settings.php';
+	});
+});
+
+
+add_action('init', function() {
+	if (isset($_GET['search_post'])) {
+		$posts = get_posts(array(
+			'post_type' => 'any',
+			's' => $_GET['search_post'],
+		));
+		echo json_encode($posts); die;
+	}
+});
+
+
+add_action('all_admin_notices', function() { ?>
+<script>
+jQuery(document).ready(function($) {
+	$(".search-box").append('<div class="search-box-ajax-results"></div>');
+
+	var $input = $("#post-search-input");
+	var $response = $(".search-box-ajax-results");
+
+	$input.attr("autocomplete", "off");
+
+	var sto;
+	$input.on("keyup", function() {
+		$response.html('<i class="fa fa-spinner fa-spin"></i> Carregando');
+
+		if (sto) clearTimeout(sto);
+		sto = setTimeout(function() {
+			$.get("<?php echo admin_url('/admin.php'); ?>", {"search_post":$input.val()}, function(response) {
+				if (response.length==0) {
+					$response.html('<div class="text-center">Nenhum resultado encontrado</div>');
+				}
+				else {
+					$response.empty();
+					for(var i in response) {
+						var post = response[i];
+						$response.append('<div class="search-box-ajax-results-each"><a href="post.php?post='+ (post.ID||"") +'&action=edit">'+ (post.post_title||"??") +'</a></div>');
+					}
+				}
+			}, "json");
+		}, 1000);
+	});
+
+	$input.on("focus", function() {
+		$response.show();
+	});
+
+	$input.on("blur", function() {
+		setTimeout(function() {
+			$response.hide();
+		}, 200);
+	});
+});
+</script>
+<style>
+.search-box-ajax-results {position:absolute; min-width:250px;}
+.search-box-ajax-results-each {background:#fff; padding:5px;}
+</style>
+<?php });
+
+
+
+
+/* add_action('manage_posts_extra_tablenav', function() { ?>
+<div class="alignleft actions">Test</div>
+<?php }); */
 
 
 // Automatic save fields name="postmeta[custom_name]"
@@ -242,38 +329,3 @@ add_action('admin_menu', function() {
 
 });
 
-
-
-/* Update */
-function cdz_update() {
-	include __DIR__ . '/libs/PclZip.php';
-	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
-	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip?rand='.rand(0,9999), 'r'));
-	$zip = new PclZip('download.zip');
-	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
-	// unlink(__DIR__ . '/download.zip');
-	return $return;
-}
-
-
-add_action("wp_ajax_520-update", function() {
-	echo json_encode(cdz_update()); die;
-});
-
-
-$ignores = array('jsiqueira.com');
-if (! in_array($_SERVER['HTTP_HOST'], $ignores)) {
-	add_action('admin_footer', function() { $rand=rand(0,9999); ?>
-	<script>
-	jQuery(document).ready(function($) {
-		$.get("https://raw.githubusercontent.com/jeff-silva/520/master/info.json?rand=<?php echo $rand; ?>", function(there) {
-			$.get("<?php echo plugins_url('520-master'); ?>/info.json?rand=<?php echo $rand; ?>", function(here) {
-				if(there.version != here.version) {
-					$.get("<?php echo admin_url("admin-ajax.php?action=520-update"); ?>");
-				}
-			}, "json");
-		}, "json");
-	});
-	</script>
-	<?php });
-}
