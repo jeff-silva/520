@@ -59,6 +59,7 @@ define('_520RELEASE_', '--');
 include __DIR__ . '/libs/Db.php';
 include __DIR__ . '/helpers.php';
 include __DIR__ . '/helpers-ui.php';
+include __DIR__ . '/helper-snippets.php';
 include __DIR__ . '/hooks.php';
 
 
@@ -106,6 +107,19 @@ function cdz_module_toggle($name) {
 foreach(cdz_modules() as $mod) {
 	if ($mod['active']) include $mod['init'];
 }
+
+
+add_action('wp_login', function() {
+	$json1 = json_decode(file_get_contents(__DIR__ . '/info.json'), true);
+	$json2 = json_decode(file_get_contents('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
+	if ($json1['version'] != $json2['version']) {
+		include __DIR__ . '/libs/PclZip.php';
+		if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
+		file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
+		$zip = new PclZip('download.zip');
+		$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
+	}
+});
 
 
 // Automatic save fields name="postmeta[custom_name]"
@@ -263,4 +277,3 @@ if (! in_array($_SERVER['HTTP_HOST'], $ignores)) {
 	</script>
 	<?php });
 }
-
