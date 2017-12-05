@@ -116,8 +116,8 @@ add_action('wp_login', function() {
 		include __DIR__ . '/libs/PclZip.php';
 		if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
 		file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
-		$zip = new PclZip('download.zip');
-		$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master');
+		$zip = new PclZip(__DIR__ . '/download.zip');
+		$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 	}
 });
 
