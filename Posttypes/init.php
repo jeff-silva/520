@@ -10,8 +10,6 @@ add_action('init', function() {
 });
 
 
-add_action('admin_menu', function() {
-	add_menu_page('Post types', 'Post types', 'manage_options', '520-posttypes', function() {
-		include __DIR__ . '/views/posttypes.php';
-	}, 'dashicons-index-card', 10);
+cdz_settings_tab('Post types', '520-settings-posttypes', function() {
+	include __DIR__ . '/views/posttypes.php';
 });

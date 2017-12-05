@@ -36,6 +36,7 @@
  * - Helper Show hooks;
  * - Helper Member custom fields;
  * - Search to static page converter;
+ * - Migrador de domínios;
  * 
  * 
  * Criar catálogo de tipos de clientes:
@@ -53,8 +54,7 @@ spl_autoload_register(function($class) {
 });
 
 
-define('_520VERSION_', '0.0.1');
-define('_520RELEASE_', '--');
+define('__520DIR__', __DIR__);
 
 
 include __DIR__ . '/libs/Db.php';
@@ -64,10 +64,17 @@ include __DIR__ . '/helper-snippets.php';
 include __DIR__ . '/hooks.php';
 
 
+function cdz_option($key, $default=null) {
+	$settings = get_option('cdz_options');
+	$settings = is_array($settings)? $settings: array();
+	return isset($settings[$key])? $settings[$key]: $default;
+}
+
+
 function cdz_modules() {
 	global $cdz_modules;
 
-	$actives = get_option('520-modules');
+	$actives = cdz_option('modules', array());
 	$actives = is_array($actives)? $actives: array();
 
 	if (! isset($cdz_modules)) {
@@ -87,20 +94,9 @@ function cdz_modules() {
 }
 
 
-function cdz_module_toggle($name) {
-	$actives = get_option('520-modules');
-	$actives = is_array($actives)? $actives: array();
-
-	if (in_array($name, $actives)) {
-		foreach($actives as $i=>$active) {
-			if ($active==$name) unset($actives[$i]);
-		}
-	}
-	else {
-		$actives[] = $name;
-	}
-
-	return update_option('520-modules', $actives, true);
+function cdz_module_active($key) {
+	$actives = cdz_option('modules', array());
+	return in_array($key, $actives);
 }
 
 
@@ -115,10 +111,37 @@ function cdz_update() {
 }
 
 
+
 function cdz_header() { ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
+
+	<style>/* CSS style | Bugfix */
+	select.form-control {height:auto!important; padding:9px;}
+	</style>
 <?php }
+
+
+
+function cdz_settings_tab($title=null, $slug=null, $callback=null) {
+	global $cdz_settings_tabs;
+	$cdz_settings_tabs = is_array($cdz_settings_tabs)? $cdz_settings_tabs: array();
+
+	if ($title AND $slug AND $callback) {
+		$cdz_settings_tabs[$slug] = array(
+			'title' => $title,
+			'slug' => $slug,
+			'callback' => $callback,
+		);
+	}
+
+	return $cdz_settings_tabs;
+}
+
 
 
 foreach(cdz_modules() as $mod) {
@@ -153,53 +176,55 @@ add_action('init', function() {
 });
 
 
-add_action('all_admin_notices', function() { ?>
-<script>
-jQuery(document).ready(function($) {
-	$(".search-box").append('<div class="search-box-ajax-results"></div>');
+if (cdz_option('post_search_active')==1) {
+	add_action('all_admin_notices', function() { ?>
+	<script>
+	jQuery(document).ready(function($) {
+		$(".search-box").append('<div class="search-box-ajax-results"></div>');
 
-	var $input = $("#post-search-input");
-	var $response = $(".search-box-ajax-results");
+		var $input = $("#post-search-input");
+		var $response = $(".search-box-ajax-results");
 
-	$input.attr("autocomplete", "off");
+		$input.attr("autocomplete", "off");
 
-	var sto;
-	$input.on("keyup", function() {
-		$response.html('<i class="fa fa-spinner fa-spin"></i> Carregando');
+		var sto;
+		$input.on("keyup", function() {
+			$response.html('<i class="fa fa-spinner fa-spin"></i> Carregando');
 
-		if (sto) clearTimeout(sto);
-		sto = setTimeout(function() {
-			$.get("<?php echo admin_url('/admin.php'); ?>", {"search_post":$input.val()}, function(response) {
-				if (response.length==0) {
-					$response.html('<div class="text-center">Nenhum resultado encontrado</div>');
-				}
-				else {
-					$response.empty();
-					for(var i in response) {
-						var post = response[i];
-						$response.append('<div class="search-box-ajax-results-each"><a href="post.php?post='+ (post.ID||"") +'&action=edit">'+ (post.post_title||"??") +'</a></div>');
+			if (sto) clearTimeout(sto);
+			sto = setTimeout(function() {
+				$.get("<?php echo admin_url('/admin.php'); ?>", {"search_post":$input.val()}, function(response) {
+					if (response.length==0) {
+						$response.html('<div class="text-center">Nenhum resultado encontrado</div>');
 					}
-				}
-			}, "json");
-		}, 1000);
-	});
+					else {
+						$response.empty();
+						for(var i in response) {
+							var post = response[i];
+							$response.append('<div class="search-box-ajax-results-each"><a href="post.php?post='+ (post.ID||"") +'&action=edit">'+ (post.post_title||"??") +'</a></div>');
+						}
+					}
+				}, "json");
+			}, 1000);
+		});
 
-	$input.on("focus", function() {
-		$response.show();
-	});
+		$input.on("focus", function() {
+			$response.show();
+		});
 
-	$input.on("blur", function() {
-		setTimeout(function() {
-			$response.hide();
-		}, 200);
+		$input.on("blur", function() {
+			setTimeout(function() {
+				$response.hide();
+			}, 200);
+		});
 	});
-});
-</script>
-<style>
-.search-box-ajax-results {position:absolute; min-width:250px;}
-.search-box-ajax-results-each {background:#fff; padding:5px;}
-</style>
-<?php });
+	</script>
+	<style>
+	.search-box-ajax-results {position:absolute; min-width:250px;}
+	.search-box-ajax-results-each {background:#fff; padding:5px;}
+	</style>
+	<?php });
+}
 
 
 
@@ -270,62 +295,4 @@ helper_ajax('520', function() {
 });
 
 
-
-add_action('init', function() {
-
-	add_action('admin_head', function() { ?>
-	<style>/* CSS style | Bugfix */
-	select.form-control {height:auto!important; padding:9px;}
-	</style>
-	<?php });
-
-});
-
-
-/* Gerenciador de módulos 520 */
-add_action('admin_menu', function() {
-
-	$user = wp_get_current_user();
-
-	if ($user->ID==1) {
-		add_menu_page('520 Modulos', '520 Modulos', 'manage_options', '520_modules', function() {
-
-		if (isset($_GET['cdz_module_toggle'])) {
-			cdz_module_toggle($_GET['cdz_module_toggle']);
-			echo "<meta http-equiv='refresh' content='0;url={$_SERVER['HTTP_REFERER']}'>"; die;
-		}
-
-		?>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
-		
-
-		<br>
-		<div class="text-right">
-			<a href="<?php echo admin_url("admin-ajax.php?action=520-update"); ?>" class="btn btn-xs btn-default" target="_blank">
-				<i class="fa fa-fw fa-refresh"></i> Update core
-			</a>
-		</div>
-		<br>
-
-		<ul class="list-group">
-			<?php foreach(cdz_modules() as $mod): ?>
-			<li class="list-group-item">
-				<div class="row">
-					<div class="col-xs-6"><?php echo $mod['basename']; ?></div>
-					<div class="col-xs-6 text-right">
-						<a href="admin.php?page=520_modules&cdz_module_toggle=<?php echo $mod['basename']; ?>">
-							<?php if ($mod['active']==1): ?>Desativar
-							<?php else: ?>Ativar<?php endif; ?>
-						</a>
-					</div>
-				</div>
-			</li>
-			<?php endforeach; ?>
-		</ul>
-
-		<pre><?php include __DIR__ . '/info.txt'; ?></pre>
-		<?php }, 'dashicons-admin-users', 1);
-	}
-
-});
 
