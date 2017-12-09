@@ -1,3 +1,7 @@
+0.0.11
+- Gerenciamento de dependências;
+- Melhoria do gerenciamento de módulos;
+
 0.0.6
 - Bugfix no gerenciador de post types;
 

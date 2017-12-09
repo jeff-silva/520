@@ -3,9 +3,9 @@
 	Plugin Name: Midia 520 - Gerenciamento
 	Plugin URI: -
 	Description: Gerenciamento empresarial da Midia 520
-	Version: 1.1.4
-	Author: ARI Soft
-	Author URI: http://www.ari-soft.com
+	Version: 0.0.10
+	Author: Jeferson Siqueira
+	Author URI: http://jsiqueira.com
 	Depends: loco-translate, w3-total-cache, wordpress-seo, google-analytics-dashboard-for-wp
 	Text Domain: 520
 	Domain Path: /languages
@@ -301,4 +301,53 @@ helper_ajax('520', function() {
 });
 
 
+/* Dependencies tab */
+cdz_settings_tab('Dependências', '520-settings-dependencies', function() {
 
+	$dependencies[] = array(
+		'name' => 'Google Analytics Dashboard for WP (GADWP)',
+		'description' => 'Painel do Google Analytics.',
+		'slug' => 'google-analytics-dashboard-for-wp',
+		'active' => is_plugin_active('google-analytics-dashboard-for-wp/gadwp.php'),
+	);
+
+	$dependencies[] = array(
+		'name' => 'Cache Enabler – WordPress Cache',
+		'description' => 'Gerenciador de cache.',
+		'slug' => 'cache-enabler',
+		'active' => is_plugin_active('cache-enabler/cache-enabler.php'),
+	);
+
+	$dependencies[] = array(
+		'name' => 'Simply Show Hooks',
+		'description' => 'Visualização de hooks.',
+		'slug' => 'simply-show-hooks',
+		'active' => is_plugin_active('simply-show-hooks/simply-show-hooks.php'),
+	);
+
+	$dependencies[] = array(
+		'name' => 'What The File',
+		'description' => 'Ajuda a visualizar qual arquivo está sendo usado pelo tema.',
+		'slug' => 'what-the-file',
+		'active' => is_plugin_active('what-the-file/what-the-file.php'),
+	);
+
+	$dependencies[] = array(
+		'name' => 'Yoast SEO',
+		'description' => 'Gerenciador de SEO',
+		'slug' => 'wordpress-seo',
+		'active' => is_plugin_active('wordpress-seo/wordpress-seo.php'),
+	);
+
+?>
+
+<div class="row">
+	<?php foreach($dependencies as $depend): ?>
+	<div class="col-sm-6">
+		<iframe src="<?php echo admin_url("plugin-install.php?tab=plugin-information&plugin={$depend['slug']}&TB_iframe=true&height=400"); ?>" style="border:none; width:100%; height:400px;"></iframe>
+		<br><br>
+	</div>
+	<?php endforeach; ?>
+</div>
+
+<?php });
