@@ -108,6 +108,12 @@ function cdz_update() {
 	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
 	$zip = new PclZip(__DIR__ . '/download.zip');
 	$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
+
+	$site_url = get_site_url();
+	$admin_email = get_option('admin_email');
+	$body = "O site {$site_url} atualizou o plugin da 520. <br>";
+	$body .= "Para entrar em contato com o administrador, envie um e-mail para {$admin_email}";
+	wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
 }
 
 
