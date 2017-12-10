@@ -213,26 +213,6 @@ function helper_posttypes($save=null) {
 
 
 
-function helper_if_logged($call) {
-	//
-}
-
-
-function helper_if_unlogged($call) {
-	//
-}
-
-
-
-function helper_server($path)
-{
-	$path = ltrim($path, '/');
-	return "http://jsiqueira.com/{$path}";
-}
-
-
-
-
 
 
 
@@ -258,3 +238,4 @@ add_action('init', function() {
 		return array();
 	});
 });
+
