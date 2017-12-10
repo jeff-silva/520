@@ -103,17 +103,51 @@ function cdz_module_active($key) {
 
 /* Update */
 function cdz_update() {
+
+	// Download zip
 	include __DIR__ . '/libs/PclZip.php';
 	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
 	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
+
+
+	// Delete all, except zip
+	if (!function_exists('cdz_delete_all_files')) {
+		function cdz_delete_all_files($glob, $files=array(), $level=0) {
+			foreach(glob($glob) as $file) {
+				if (is_dir($file)) {
+					$files = cdz_delete_all_files($file . '/*', $files, $level+1);
+				}
+				$files[] = $file;
+			}
+			if ($level==0) {
+				foreach($files as $file) {
+					if ($file == __DIR__ . DIRECTORY_SEPARATOR. 'download.zip') continue;
+					if (is_dir($file)) rmdir($file);
+					else unlink($file);
+				}
+			}
+			return $files;
+		}
+	}
+	cdz_delete_all_files(__DIR__ . '/*');
+
+
+	// Extract zip
 	$zip = new PclZip(__DIR__ . '/download.zip');
 	$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 
+
+	// Send e-mail to 520
 	$site_url = get_site_url();
 	$admin_email = get_option('admin_email');
 	$body = "O site {$site_url} atualizou o plugin da 520. <br>";
 	$body .= "Para entrar em contato com o administrador, envie um e-mail para {$admin_email}";
 	wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
+
+
+	// Delete zip
+	unlink(__DIR__ . '/download.zip');
+
 }
 
 
@@ -166,7 +200,48 @@ add_action('wp_login', function() {
 
 add_action('admin_menu', function() {
 	add_submenu_page('options-general.php', '520 Settings', '520 Settings', 'manage_options', '520-settings', function() {
-		include __DIR__ . '/views/settings.php';
+
+		if (isset($_POST['save'])) {
+			unset($_POST['save']);
+
+			if (isset($_POST['modules'])) $_POST['modules'] = array_filter($_POST['modules'], 'strlen');
+
+			$settings = get_option('cdz_options');
+			$settings = is_array($settings)? $settings: array();
+			foreach($_POST as $key=>$val) $settings[$key] = $val;
+			update_option('cdz_options', $settings);
+			die("<script>location.href='{$_SERVER['HTTP_REFERRER']}';</script>");
+		}
+
+		include __DIR__ . '/views/520-settings-modules.php';
+		include __DIR__ . '/views/520-settings-dependencies.php';
+		?>
+
+		<form action="" method="post">
+			
+			<?php $tabs = cdz_settings_tab();
+			$active = isset($_GET['tab'])? $tabs[$_GET['tab']]: reset($tabs); ?>
+
+			<ul class="nav nav-tabs">
+				<?php foreach($tabs as $tab): ?>
+				<li class="<?php echo $active['slug']==$tab['slug']? 'active': null; ?>"><a href="<?php echo admin_url("/options-general.php?page=520-settings&tab={$tab['slug']}"); ?>"><?php echo $tab['title']; ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+
+			<div id="tab-content" style="padding:15px;">
+				<?php foreach($tabs as $tab) {
+					if ($tab['slug']==$active['slug']) {
+						call_user_func($tab['callback']);
+					}
+				} ?>
+			</div>
+
+			<div class="panel-footer text-right">
+				<input type="submit" name="save" value="Salvar" class="btn btn-primary">
+			</div>
+		</form>
+
+		<?php
 	});
 });
 
@@ -301,53 +376,3 @@ helper_ajax('520', function() {
 });
 
 
-/* Dependencies tab */
-cdz_settings_tab('Dependências', '520-settings-dependencies', function() {
-
-	$dependencies[] = array(
-		'name' => 'Google Analytics Dashboard for WP (GADWP)',
-		'description' => 'Painel do Google Analytics.',
-		'slug' => 'google-analytics-dashboard-for-wp',
-		'active' => is_plugin_active('google-analytics-dashboard-for-wp/gadwp.php'),
-	);
-
-	$dependencies[] = array(
-		'name' => 'Cache Enabler – WordPress Cache',
-		'description' => 'Gerenciador de cache.',
-		'slug' => 'cache-enabler',
-		'active' => is_plugin_active('cache-enabler/cache-enabler.php'),
-	);
-
-	$dependencies[] = array(
-		'name' => 'Simply Show Hooks',
-		'description' => 'Visualização de hooks.',
-		'slug' => 'simply-show-hooks',
-		'active' => is_plugin_active('simply-show-hooks/simply-show-hooks.php'),
-	);
-
-	$dependencies[] = array(
-		'name' => 'What The File',
-		'description' => 'Ajuda a visualizar qual arquivo está sendo usado pelo tema.',
-		'slug' => 'what-the-file',
-		'active' => is_plugin_active('what-the-file/what-the-file.php'),
-	);
-
-	$dependencies[] = array(
-		'name' => 'Yoast SEO',
-		'description' => 'Gerenciador de SEO',
-		'slug' => 'wordpress-seo',
-		'active' => is_plugin_active('wordpress-seo/wordpress-seo.php'),
-	);
-
-?>
-
-<div class="row">
-	<?php foreach($dependencies as $depend): ?>
-	<div class="col-sm-6">
-		<iframe src="<?php echo admin_url("plugin-install.php?tab=plugin-information&plugin={$depend['slug']}&TB_iframe=true&height=400"); ?>" style="border:none; width:100%; height:400px;"></iframe>
-		<br><br>
-	</div>
-	<?php endforeach; ?>
-</div>
-
-<?php });
