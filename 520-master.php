@@ -61,7 +61,6 @@ include __DIR__ . '/libs/Db.php';
 include __DIR__ . '/helpers.php';
 include __DIR__ . '/helpers-ui.php';
 include __DIR__ . '/helper-snippets.php';
-include __DIR__ . '/hooks.php';
 
 
 function cdz_option($key, $default=null) {
