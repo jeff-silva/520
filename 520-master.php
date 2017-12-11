@@ -63,10 +63,13 @@ include __DIR__ . '/helpers-ui.php';
 include __DIR__ . '/helper-snippets.php';
 
 
-function cdz_option($key, $default=null) {
+function cdz_option($key=null, $default=null) {
 	$settings = get_option('cdz_options');
 	$settings = is_array($settings)? $settings: array();
-	return isset($settings[$key])? $settings[$key]: $default;
+	if ($key) {
+		return isset($settings[$key])? $settings[$key]: $default;
+	}
+	return $settings;
 }
 
 
@@ -216,7 +219,7 @@ add_action('admin_menu', function() {
 		include __DIR__ . '/views/520-settings-dependencies.php';
 		?>
 
-		<form action="" method="post">
+		<form action="" method="post" autocomplete="off">
 			
 			<?php $tabs = cdz_settings_tab();
 			$active = isset($_GET['tab'])? $tabs[$_GET['tab']]: reset($tabs); ?>

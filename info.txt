@@ -1,3 +1,6 @@
+0.0.12
+- Módulo Trello para gerenciar projetos;
+
 0.0.11
 - Gerenciamento de dependências;
 - Melhoria do gerenciamento de módulos;
