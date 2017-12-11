@@ -104,7 +104,7 @@ class BS3_Panel extends Helper_Snippet
 helper_snippet_add('BS3_Panel');
 
 
-add_action('the_content', function($content) {
+/* add_action('the_content', function($content) {
 	global $post, $helper_snippets;
 
 	$contents = json_decode($post->post_content);
@@ -185,7 +185,7 @@ add_action('the_content', function($content) {
 	});
 	</script>
 	<?php return ob_get_clean(); 
-});
+}); */
 
 
 add_action('wp_enqueue_scripts', function() {
