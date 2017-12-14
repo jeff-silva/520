@@ -213,6 +213,45 @@ function helper_posttypes($save=null) {
 
 
 
+function helper_posts($query, $callback) {
+	global $post;
+
+	if (is_string($query)) {
+		parse_str($query, $query);
+		$query = new WP_Query($query);
+	}
+
+	if (get_class($query) != 'WP_Query') return false;
+
+	if ($query->have_posts() AND is_callable($callback)) {
+		$index = 0;
+		while ($query->have_posts()) {
+			$query->the_post();
+			call_user_func($callback, $post, $index);
+			$index++;
+		}
+		wp_reset_postdata();
+		return $query;
+	}
+
+	return false;
+}
+
+
+function helper_post($id, $callback) {
+	global $post;
+	$return = false;
+	if (is_callable($callback) AND $post = get_post($id)) {
+		$return = $post;
+		setup_postdata($post);
+		call_user_func($callback, $post);
+		wp_reset_postdata();
+	}
+	return $return;
+}
+
+
+
 
 
 
