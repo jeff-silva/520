@@ -121,7 +121,7 @@ function helper_breadcrumbs() {
 }
 
 
-function helper_social_share($except=array()) {
+function helper_social_share($except=array(), $echo=true) {
 	global $post;
 	$share_url = urlencode(get_permalink());
 	$share_title = urlencode(get_the_title());
@@ -149,13 +149,20 @@ function helper_social_share($except=array()) {
 		'whatsapp' => array(
 			'name' => 'Whatsapp',
 			'icon' => '<i class="fa fa-fw fa-whatsapp"></i>',
-			'url' => "whatsapp://send?text={$share_url}",
+			'url' => "https://api.whatsapp.com/send?text={$share_url}",
+			// 'url' => "whatsapp://send?text={$share_url}",
 		),
 	);
 
 	foreach($socials as $id=>$social) {
 		if (in_array($id, $except)) {
 			unset($socials[$id]);
+		}
+	}
+
+	if ($echo==true) {
+		foreach($socials as $social) {
+			echo "<li><a href='{$social['url']}' target='_blank'>{$social['icon']} <span>{$social['name']}</span></a></li>";
 		}
 	}
 
@@ -218,10 +225,9 @@ function helper_posts($query, $callback) {
 
 	if (is_string($query)) {
 		parse_str($query, $query);
-		$query = new WP_Query($query);
 	}
 
-	if (get_class($query) != 'WP_Query') return false;
+	$query = new WP_Query($query);
 
 	if ($query->have_posts() AND is_callable($callback)) {
 		$index = 0;
@@ -240,11 +246,15 @@ function helper_posts($query, $callback) {
 
 function helper_post($id, $callback) {
 	global $post;
+
+	if (! $id) $page = $post;
+	else $page = get_post($id);
+
 	$return = false;
-	if (is_callable($callback) AND $post = get_post($id)) {
-		$return = $post;
-		setup_postdata($post);
-		call_user_func($callback, $post);
+	if (is_callable($callback) AND $page) {
+		$return = $page;
+		setup_postdata($page);
+		call_user_func($callback, $page);
 		wp_reset_postdata();
 	}
 	return $return;

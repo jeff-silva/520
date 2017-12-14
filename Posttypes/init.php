@@ -3,10 +3,7 @@
 
 add_action('init', function() {
 	$posttypes = new Posttypes\Posttypes();
-	$posttypes = $posttypes->search();
-	foreach($posttypes as $posttype) {
-		register_post_type($posttype['post_type'], $posttype['post_type_args']);
-	}
+	$posttypes->register();
 });
 
 

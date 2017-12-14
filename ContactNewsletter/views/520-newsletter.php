@@ -13,12 +13,18 @@ cdz_header();
 		</tr>
 	</thead>
 	<tbody>
-		<?php helper_posts('post_type=newsletter&post_status=draft', function($post) {
+		<?php $query = helper_posts('post_type=newsletter&post_status=draft', function($post) {
 		$meta = get_post_meta($post->ID, 'meta-action', true);
 		?>
 		<tr>
 			<td><?php echo $meta['email']; ?></td>
 		</tr>
 		<?php }) ?>
+
+		<?php if (! $query): ?>
+		<tr>
+			<td class="text-center text-muted">Nenhum resultado encontrado</td>
+		</tr>
+		<?php endif; ?>
 	</tbody>
 </table>

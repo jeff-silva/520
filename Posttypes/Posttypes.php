@@ -81,12 +81,6 @@ class Posttypes extends \Db
 
 
 
-	public function search()
-	{
-		$posttypes = get_option('520-posttypes');
-		$posttypes = is_array($posttypes)? $posttypes: array();
-		return $posttypes;
-	}	
 
 	public function createDefault($post_type, $singular, $plural)
 	{
@@ -140,7 +134,7 @@ class Posttypes extends \Db
 				'capabilities' => array(),
 				'map_meta_cap' => null,
 				'hierarchical' => null,
-				'supports' => array(),
+				'supports' => array('thumbnail'),
 				'register_meta_box_cb' => false,
 				'taxonomies' => array('category', 'post_tag'),
 				'has_archive' => false,
@@ -161,6 +155,34 @@ class Posttypes extends \Db
 			$taxonomies[] = $taxo;
 		}
 		return $taxonomies;
+	}
+
+
+	public function search()
+	{
+		$posttypes = get_option('520-posttypes');
+		$posttypes = is_array($posttypes)? $posttypes: array();
+		return $posttypes;
+	}
+
+
+	public function register()
+	{
+		$posttypes = $this->search();
+		foreach($posttypes as $posttype) {
+			$posttype['post_type_args']['supports'] = isset($posttype['post_type_args']['supports'])? $posttype['post_type_args']['supports']: array();
+			$posttype['post_type_args']['supports'][] = 'title';
+			$posttype['post_type_args']['supports'][] = 'editor';
+			$posttype['post_type_args']['supports'][] = 'thumbnail';
+			$posttype['post_type_args']['rewrite'] = array();
+			// dd($posttype); die;
+			register_post_type($posttype['post_type'], $posttype['post_type_args']);
+		}
+
+		$thumbs = array('post', 'page');
+		foreach($posttypes as $posttype) $thumbs[] = $posttype['post_type'];
+		add_theme_support('post-thumbnails', $thumbs);
+		// set_post_thumbnail_size( 140, 140, true );
 	}
 
 

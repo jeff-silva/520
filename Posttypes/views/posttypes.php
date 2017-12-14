@@ -306,7 +306,8 @@
 									</div>
 									<div class="col-xs-6 form-group">
 										<label>supports</label>
-										<input type="text" v-model="posttypeEdit.post_type_args.supports" class="form-control">
+										['thumbnail']
+										<!-- <input type="text" v-model="posttypeEdit.post_type_args.supports" class="form-control"> -->
 									</div>
 									<div class="col-xs-6 form-group">
 										<label>register_meta_box_cb</label>

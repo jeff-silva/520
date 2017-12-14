@@ -33,13 +33,17 @@ add_action('init', function() {
 		$email = isset($_REQUEST['email'])? $_REQUEST['email']: null;
 		$error = array();
 
+		if (! $action) {
+			$error[] = 'Action indefinida';
+		}
+
 		// Validando e-mail (obrigatório em todos os casos)
 		if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			$error[] = 'E-mail inválido';
 		}
 
 		// Verificando se e-mail existe em action=newsletter
-		if ($action=='newsletter') {
+		if ($action=='newsletter' AND $email) {
 			$exists = $wpdb->get_results(" select * from {$wpdb->prefix}postmeta where meta_value like '%\"{$email}\"%' ");
 			if (sizeof($exists) > 0) $error[] = 'Este e-mail já está cadastrado em nossa newsletter';
 		}

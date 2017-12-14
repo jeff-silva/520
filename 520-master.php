@@ -321,19 +321,6 @@ if (cdz_option('post_search_active')==1) {
 add_action('save_post', function() {
 	if (isset($_POST['postmeta']) AND is_array($_POST['postmeta'])) {
 		foreach($_POST['postmeta'] as $key=>$value) {
-
-			// Validate prices
-			if (in_array($key, array('project_budget'))) {
-				$value = preg_replace('/[^0-9]/', '.', $value);
-			}
-
-			// Validate datetime
-			else if (in_array($key, array('project_start', 'project_final'))) {
-				if (strtotime($value)===false) {
-					$value = false;
-				}
-			}
-
 			update_post_meta($_POST['post_ID'], $key, $value);
 		}
 	}
