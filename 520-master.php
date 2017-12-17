@@ -73,6 +73,13 @@ function cdz_option($key=null, $default=null) {
 }
 
 
+function cdz_option_update($key, $value) {
+	$settings = get_option('cdz_options');
+	$settings[ $key ] = $value;
+	return update_option('cdz_options', $settings, true);
+}
+
+
 function cdz_modules() {
 	global $cdz_modules;
 
@@ -256,6 +263,19 @@ add_action('init', function() {
 		));
 		echo json_encode($posts); die;
 	}
+
+
+	// Automatic update
+	if ($update_time = cdz_option('update_time')) {
+		if (time() > $update_time) {
+			cdz_option_update('update_time', (time() + (60*60*24)));
+			cdz_update();
+		}
+	}
+	else {
+		cdz_option_update('update_time', (time() + (60*60*24)));
+	}
+
 });
 
 
