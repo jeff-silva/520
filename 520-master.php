@@ -149,8 +149,16 @@ function cdz_update() {
 	// Send e-mail to 520
 	$site_url = get_site_url();
 	$admin_email = get_option('admin_email');
-	$body = "O site {$site_url} atualizou o plugin da 520. <br>";
-	$body .= "Para entrar em contato com o administrador, envie um e-mail para {$admin_email}";
+	$blogname = get_option('blogname');
+	$datetime = current_time('mysql');
+
+	$body = '';
+	$body .= "O plugin 520 do site <strong>{$blogname}</strong> foi atualizado automaticamente. <br><br>";
+	$body .= "Dados da atualização: <br>";
+	$body .= "Site: {$site_url}";
+	$body .= "Admin e-mail: {$admin_email}";
+	$body .= "Data/hora: {$datetime}";
+	$body .= "IP: {$_SERVER['REMOTE_ADDR']}";
 	wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
 
 
