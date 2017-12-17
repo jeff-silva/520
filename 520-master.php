@@ -1,9 +1,9 @@
 <?php
 /*
-	Plugin Name: Midia 520 - Gerenciamento
-	Plugin URI: -
-	Description: Gerenciamento empresarial da Midia 520
-	Version: 0.0.10
+	Plugin Name: 520 Tools
+	Plugin URI: http://jsiqueira.com
+	Description: Ferramentas facilitadoras
+	Version: 0.0.18
 	Author: Jeferson Siqueira
 	Author URI: http://jsiqueira.com
 	Depends: loco-translate, w3-total-cache, wordpress-seo, google-analytics-dashboard-for-wp
@@ -331,10 +331,13 @@ add_action('save_post', function() {
 
 //wp-admin/admin-ajax.php?action=520&call=Test.Aaa.search
 helper_ajax('520', function() {
-	$call = explode('.', (isset($_GET['call'])? $_GET['call']: null));
-	$method = array_pop($call);
-	$method = 'api'.ucfirst($method);
-	$call = array_map('ucfirst', $call);
+	$params = explode('.', (isset($_GET['call'])? $_GET['call']: null));
+
+	$call = array();
+	$call[] = array_shift($params);
+	$call[] = array_shift($params);
+	$method = 'api'. ucfirst(array_shift($params));
+
 	
 	if ($include = realpath(__DIR__ .'/'. implode('/', $call) .'.php')) {
 		$class = implode('\\', $call);
@@ -342,7 +345,7 @@ helper_ajax('520', function() {
 		$call = array($class, $method);
 		if (is_callable($call)) {
 			$error = false;
-			$success = call_user_func($call);
+			$success = call_user_func_array($call, $params);
 			if (property_exists($call[0], 'error')) {
 				if (is_array($call[0]->error) AND !empty($call[0]->error)) {
 					$error = $call[0]->error;
