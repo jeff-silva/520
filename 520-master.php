@@ -417,13 +417,13 @@ add_shortcode('collection', function($atts=null, $content=null) {
 
 
 	if ($query->have_posts()) {
-		echo "<{$atts['wrapper']} class='{$atts['wrapper_class']}'>";
+		if ($atts['wrapper']) echo "<{$atts['wrapper']} class='{$atts['wrapper_class']}'>";
 		while ($query->have_posts()) {
 			$query->the_post();
 			get_template_part($atts['template']);
 		}
 		wp_reset_postdata();
-		echo "</{$atts['wrapper']}>";
+		if ($atts['wrapper']) echo "</{$atts['wrapper']}>";
 
 		if (! function_exists('shortcode_collection_url')) {
 			function shortcode_collection_url($url) {
