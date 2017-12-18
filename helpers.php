@@ -246,21 +246,25 @@ function helper_posts($query, $callback) {
 
 function helper_post($id, $callback) {
 	global $post;
-
-	if (! $id) $page = $post;
-	else $page = get_post($id);
-
+	if ($id) $post = get_post($id);
 	$return = false;
-	if (is_callable($callback) AND $page) {
-		$return = $page;
-		setup_postdata($page);
-		call_user_func($callback, $page);
+	if (is_callable($callback) AND $post) {
+		$return = $post;
+		setup_postdata($post);
+		call_user_func($callback, $post);
 		wp_reset_postdata();
 	}
 	return $return;
 }
 
 
+
+
+function helper_thumbnail($post, $default=null) {
+	$thumbnail = get_the_post_thumbnail_url($post, 'full');
+	$default = $default===true? (plugin_dir_url(__FILE__) . 'assets/nophoto.jpg'): $default;
+    return $thumbnail? $thumbnail: $default;
+}
 
 
 
