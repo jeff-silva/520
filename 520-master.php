@@ -396,3 +396,59 @@ helper_ajax('520', function() {
 });
 
 
+add_shortcode('collection', function($atts=null, $content=null) {
+	ob_start();
+	$atts = shortcode_atts(array(
+		'query' => 'post_type=any',
+		'template' => 'partials/loop',
+		'empty' => 'partials/empty',
+		'pagination' => '1',
+		'wrapper' => 'div',
+		'wrapper_class' => 'row',
+	), $atts);
+
+	
+	$atts['query'] = htmlspecialchars_decode($atts['query']);
+	parse_str($atts['query'], $query);
+
+	$current_page = isset($_GET['pag'])? $_GET['pag']: 1;
+	$query['paged'] = $current_page;
+	$query = new WP_Query($query);
+
+
+	if ($query->have_posts()) {
+		echo "<{$atts['wrapper']} class='{$atts['wrapper_class']}'>";
+		while ($query->have_posts()) {
+			$query->the_post();
+			get_template_part($atts['template']);
+		}
+		wp_reset_postdata();
+		echo "</{$atts['wrapper']}>";
+
+		if (! function_exists('shortcode_collection_url')) {
+			function shortcode_collection_url($url) {
+				parse_str($url, $url);
+				$url = array_merge($_GET, $url);
+				return '?' . http_build_query($url);
+			}
+		}
+
+
+		// found_posts: total de resultados
+		// post_count: total na página atual
+		// max_num_pages: quantidade de paginas
+		if ($atts['pagination']==1 AND $query->max_num_pages>1) {
+			echo '<ul class="pagination">';
+			echo '<li><a href="'. shortcode_collection_url('pag=1') .'">&laquo;</a></li>';
+			for($page=1; $page<=$query->max_num_pages; $page++) {
+				echo "<li><a href='". shortcode_collection_url("pag={$page}") ."'>{$page}</a></li>";
+			}
+			echo '<li><a href="'. shortcode_collection_url("pag={$query->max_num_pages}") .'">&raquo;</a></li>';
+			echo '</ul>';
+		}
+	}
+	else {
+		get_template_part($atts['empty']);
+	}
+	return ob_get_clean();
+});
