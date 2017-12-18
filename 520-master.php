@@ -405,11 +405,16 @@ add_shortcode('collection', function($atts=null, $content=null) {
 		'pagination' => '1',
 		'wrapper' => 'div',
 		'wrapper_class' => 'row',
+		'merge_url' => '0',
 	), $atts);
 
 	
 	$atts['query'] = htmlspecialchars_decode($atts['query']);
 	parse_str($atts['query'], $query);
+
+	if ($atts['merge_url']==1) {
+		$query = array_merge($query, $_GET);
+	}
 
 	$current_page = isset($_GET['pag'])? $_GET['pag']: 1;
 	$query['paged'] = $current_page;
