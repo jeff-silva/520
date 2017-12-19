@@ -207,8 +207,8 @@ foreach(cdz_modules() as $mod) {
 
 
 add_action('wp_login', function() {
-	$json1 = json_decode(file_get_contents(__DIR__ . '/info.json'), true);
-	$json2 = json_decode(file_get_contents('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
+	$json1 = json_decode(helper_content(__DIR__ . '/info.json'), true);
+	$json2 = json_decode(helper_content('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
 	if ($json1['version'] != $json2['version']) {
 		cdz_update();
 	}

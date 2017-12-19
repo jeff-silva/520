@@ -268,6 +268,23 @@ function helper_thumbnail($post, $default=null) {
 
 
 
+function helper_content($url, $post=null) {
+	$ch = curl_init();
+	curl_setopt ($ch, CURLOPT_URL, $url);
+	curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
+	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+	$return = curl_exec($ch);
+	// if (curl_errno($ch)) {
+	// 	$return = 'Error: '. curl_error($ch);
+	// }
+	curl_close($ch);
+	return $return;
+}
+
+
+
 
 // Remove window._wpemojiSettings from HTML
 add_action('init', function() {

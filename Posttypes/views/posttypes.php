@@ -1,7 +1,6 @@
 <div class="wrap">
 <h1>Post types</h1>
 
-
 <div id="app">
 
 	<div class="text-right">
@@ -361,17 +360,18 @@
 
 <link rel="stylesheet" href="<?php echo plugins_url('520-master'); ?>/assets/bs3-ui.css">
 
+<?php $Posttypes = new Posttypes\Posttypes(); ?>
 <script>
 var app = new Vue({
 	el: "#app",
 	data: {
 		loading: false,
 		error: [],
-		taxonomies: <?php echo json_encode( (new Posttypes\Posttypes())->taxonomies() ); ?>,
+		taxonomies: <?php echo json_encode( $Posttypes->taxonomies() ); ?>,
 		posttypeNew: {post_type:"", singular:"", plural:""},
 		posttypeEdit: null,
-		posttypes: <?php echo json_encode( (new Posttypes\Posttypes())->search() ); ?>,
-		dashicons: <?php echo json_encode( (new Posttypes\Posttypes())->dashicons() ); ?>,
+		posttypes: <?php echo json_encode( $Posttypes->search() ); ?>,
+		dashicons: <?php echo json_encode( $Posttypes->dashicons() ); ?>,
 	},
 	methods: {
 		_posttypeSearch: function() {
