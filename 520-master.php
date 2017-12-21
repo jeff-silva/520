@@ -227,7 +227,6 @@ add_action('admin_menu', function() {
 			$settings = is_array($settings)? $settings: array();
 			foreach($_POST as $key=>$val) $settings[$key] = $val;
 			update_option('cdz_options', $settings);
-			die("<script>location.href='{$_SERVER['HTTP_REFERRER']}';</script>");
 		}
 
 		include __DIR__ . '/views/520-settings-modules.php';
