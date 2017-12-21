@@ -145,26 +145,22 @@ function cdz_update() {
 	$zip = new PclZip(__DIR__ . '/download.zip');
 	$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 
-
-	// Send e-mail to 520
-	$site_url = get_site_url();
-	$admin_email = get_option('admin_email');
-	$blogname = get_option('blogname');
-	$datetime = current_time('mysql');
-
-	$body = '';
-	$body .= "O plugin 520 do site <strong>{$blogname}</strong> foi atualizado automaticamente. <br><br>";
-	$body .= "Dados da atualização: <br>";
-	$body .= "Site: {$site_url} <br>";
-	$body .= "Admin e-mail: {$admin_email} <br>";
-	$body .= "Data/hora: {$datetime} <br>";
-	$body .= "IP: {$_SERVER['REMOTE_ADDR']} <br>";
-	wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
-
-
 	// Delete zip
 	unlink(__DIR__ . '/download.zip');
 
+	// Send e-mail to 520
+	// $site_url = get_site_url();
+	// $admin_email = get_option('admin_email');
+	// $blogname = get_option('blogname');
+	// $datetime = current_time('mysql');
+	// $body = '';
+	// $body .= "O plugin 520 do site <strong>{$blogname}</strong> foi atualizado automaticamente. <br><br>";
+	// $body .= "Dados da atualização: <br>";
+	// $body .= "Site: {$site_url} <br>";
+	// $body .= "Admin e-mail: {$admin_email} <br>";
+	// $body .= "Data/hora: {$datetime} <br>";
+	// $body .= "IP: {$_SERVER['REMOTE_ADDR']} <br>";
+	// wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
 }
 
 

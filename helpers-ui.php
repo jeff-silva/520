@@ -6,8 +6,9 @@ class Ui
 
 	static function uploader($attr=null)
 	{
+		$id = uniqid(rand(), true);
 		?>
-		<div class="helper-ui-uploader">
+		<div class="helper-ui-uploader" id="<?php echo $id; ?>">
 			<div class="input-group">
 				<input type="text" <?php echo $attr; ?> class="form-control helper-ui-uploader-input">
 				<div class="input-group-btn">
@@ -15,7 +16,22 @@ class Ui
 				</div>
 			</div>
 		</div>
-		<?php
+		<?php wp_enqueue_media(); ?>
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			$("#<?php echo $id; ?> .helper-ui-uploader-btn").on("click", function(ev) {
+				var $parent = $("#<?php echo $id; ?>");
+				var image = wp.media({title:'Upload', multiple: false}).open().on('select', function(e) {
+					var uploaded_image = image.state().get('selection').first();
+					var image_url = uploaded_image.toJSON().url;
+					$parent.find("img").attr("src", image_url);
+					$parent.find(".helper-ui-uploader-input").val(image_url);
+					$parent.find(".helper-ui-uploader-cover").css({"background-image":'url('+image_url+')'});
+				});
+			});
+		});
+		</script>
+	<?php
 	}
 
 
@@ -78,39 +94,4 @@ class Ui
 		<?php
 	}
 
-}
-
-
-add_action( 'wp_loaded', function() {
-	add_action('wp_footer', 'helpers_ui_footer');
-	add_action('admin_footer', 'helpers_ui_footer');
-});
-
-function helpers_ui_footer() {
-	wp_enqueue_media(); ?>
-	<script type="text/javascript">
-	jQuery(document).ready(function($) {
-
-		$("body").click(function(ev) {
-
-			// Ui::uploader
-			if ( $(ev.target).hasClass("helper-ui-uploader-btn") ) {
-				ev.preventDefault();
-				var $parent = $(ev.target).closest(".helper-ui-uploader");
-
-
-
-				// var image = wp.media({title:'Upload', multiple: false}).open().on('select', function(e) {
-				// 	var uploaded_image = image.state().get('selection').first();
-				// 	var image_url = uploaded_image.toJSON().url;
-				// 	$parent.find("img").attr("src", image_url);
-				// 	$parent.find(".helper-ui-uploader-input").val(image_url);
-				// 	$parent.find(".helper-ui-uploader-cover").css({"background-image":'url('+image_url+')'});
-				// });
-			}
-
-		});
-	});
-	</script>
-	<?php
 }
