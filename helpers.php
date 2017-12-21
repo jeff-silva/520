@@ -54,8 +54,16 @@ function helper_query($value, $call=null) {
 
 
 
-function helper_breadcrumbs() {
+function helper_breadcrumb($callback=null) {
 	global $post;
+
+	$callback = is_callable($callback)? $callback: function($breads) { ?>
+		<ul class="breadcrumb">
+			<?php foreach($breads as $bread): ?>
+			<li><a href="<?php echo $bread['url']; ?>"><?php echo $bread['title']; ?></a></li>
+			<?php endforeach; ?>
+		</ul>
+	<?php };
 
 	$breads = array(
 		array(
@@ -68,7 +76,7 @@ function helper_breadcrumbs() {
 
 	else if (is_search()) {
 		$breads[] = array(
-			'title' => "Pesquisa por <q>{$_GET['s']}</q>",
+			'title' => "Pesquisa</q>",
 			'url' => 'javascript:;',
 		);
 	}
@@ -108,7 +116,7 @@ function helper_breadcrumbs() {
 		$type = get_post_type_object($post->post_type);
 		$breads[] = array(
 			'title' => $type->labels->name,
-			'url' => 'javascript:;',
+			'url' => home_url("?s=+&post_type={$type->name}"),
 		);
 
 		$breads[] = array(
@@ -117,8 +125,36 @@ function helper_breadcrumbs() {
 		);
 	}
 
-	return $breads;
+	return call_user_func($callback, $breads);
 }
+
+
+
+
+function helper_category_tree($taxonomy, $params=array(), $callback=null) {
+	$callback = is_callable($callback)? $callback: function($taxonomy, $params, $terms, $callback) { ?>
+		<ul class="list-group">
+			<?php foreach($terms as $term): ?>
+			<li class="list-group-item">
+				<a href="<?php echo get_term_link($term); ?>"><?php echo $term->name; ?></a>
+				<?php $params['parent'] = $term->term_id;
+				helper_category_tree($taxonomy, $params, $callback); ?>
+			</li>
+			<?php endforeach; ?>
+		</ul>
+	<?php };
+
+	if (! is_array($params)) parse_str($params, $params);
+	$params = array_merge(array(
+		'hierarchical' => 1,
+		'hide_empty' => 0,
+		'parent' => 0,
+	), $params);
+	$terms = get_terms($taxonomy, $params);
+	if (empty($terms)) return false;
+	return call_user_func($callback, $taxonomy, $params, $terms, $callback);
+}
+
 
 
 function helper_social_share($except=array(), $echo=true) {
