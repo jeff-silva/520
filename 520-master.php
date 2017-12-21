@@ -264,6 +264,35 @@ add_action('admin_menu', function() {
 
 
 add_action('init', function() {
+	if (isset($_GET['520-action'])) {
+		$json = array('success'=>false, 'error'=>false);
+		$params = explode('.', $_GET['520-action']);
+		if (sizeof($params)>=3) {
+			$class[] = array_shift($params);
+			$class[] = array_shift($params);
+			$class = implode('\\', $class);
+			$method = 'api' . ucfirst(array_shift($params));
+			$call = array($class, $method);
+			if (is_callable($call)) {
+				$class = new $class();
+				$call = array($class, $method);
+				try {
+					$json['success'] = call_user_func_array($call, $params);
+				}
+				catch(\Exception $e) {
+					$json['error'] = $e->getMessage();
+				}
+			}
+		}
+		else {
+			$json['error'] = 'Parâmetros insuficientes';
+		}
+
+		die(json_encode($json));
+	}
+
+
+
 	if (isset($_GET['search_post'])) {
 		$posts = get_posts(array(
 			'post_type' => 'any',
