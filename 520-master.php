@@ -60,7 +60,6 @@ define('__520DIR__', __DIR__);
 include __DIR__ . '/libs/Db.php';
 include __DIR__ . '/helpers.php';
 include __DIR__ . '/helpers-ui.php';
-include __DIR__ . '/helper-snippets.php';
 
 
 function cdz_option($key=null, $default=null) {
@@ -90,6 +89,7 @@ function cdz_modules() {
 		$cdz_modules = array();
 		foreach(glob(__DIR__ . '/*') as $file) {
 			if (is_dir($file) AND $init = realpath("{$file}/init.php")) {
+				if ($file == __DIR__ .'/Cdz') continue;
 				$info = pathinfo($file);
 				$info['fullname'] = $file;
 				$info['init'] = $init;
@@ -116,7 +116,8 @@ function cdz_update() {
 	// Download zip
 	include __DIR__ . '/libs/PclZip.php';
 	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
-	file_put_contents(__DIR__ . '/download.zip', fopen('https://github.com/jeff-silva/520/archive/master.zip', 'r'));
+	$content = helper_content('https://github.com/jeff-silva/520/archive/master.zip');
+	file_put_contents(__DIR__ . '/download.zip', $content);
 
 
 	// Delete all, except zip
@@ -143,24 +144,25 @@ function cdz_update() {
 
 	// Extract zip
 	$zip = new PclZip(__DIR__ . '/download.zip');
-	$zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
+	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 
 	// Delete zip
 	unlink(__DIR__ . '/download.zip');
+	return $return? true: false;
+}
 
-	// Send e-mail to 520
-	// $site_url = get_site_url();
-	// $admin_email = get_option('admin_email');
-	// $blogname = get_option('blogname');
-	// $datetime = current_time('mysql');
-	// $body = '';
-	// $body .= "O plugin 520 do site <strong>{$blogname}</strong> foi atualizado automaticamente. <br><br>";
-	// $body .= "Dados da atualização: <br>";
-	// $body .= "Site: {$site_url} <br>";
-	// $body .= "Admin e-mail: {$admin_email} <br>";
-	// $body .= "Data/hora: {$datetime} <br>";
-	// $body .= "IP: {$_SERVER['REMOTE_ADDR']} <br>";
-	// wp_mail('lampejo520@gmail.com', 'Atualização 520', $body, array('Content-Type: text/html; charset=UTF-8'));
+
+
+function cdz_need_update() {
+	$data1 = json_decode(helper_content(__DIR__ . DIRECTORY_SEPARATOR . 'info.json'), true);
+	$data2 = json_decode(helper_content('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
+	if ($data1['version'] != $data2['version']) {
+		return array(
+			'current' => $data1['version'],
+			'new' => $data2['version'],
+		);
+	}
+	return false;
 }
 
 
@@ -196,10 +198,12 @@ function cdz_settings_tab($title=null, $slug=null, $callback=null) {
 }
 
 
-
 foreach(cdz_modules() as $mod) {
-	if ($mod['active']) include $mod['init'];
+	if ($mod['active']) {
+		include_once $mod['init'];
+	}
 }
+include_once __DIR__ . '/Cdz/init.php';
 
 
 add_action('wp_login', function() {
@@ -225,10 +229,8 @@ add_action('admin_menu', function() {
 			update_option('cdz_options', $settings);
 		}
 
-		include __DIR__ . '/views/520-settings-modules.php';
-		include __DIR__ . '/views/520-settings-dependencies.php';
-		?>
-
+		cdz_header(); ?>
+		<br><br>
 		<form action="" method="post" autocomplete="off">
 			
 			<?php $tabs = cdz_settings_tab();

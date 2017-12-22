@@ -305,6 +305,11 @@ function helper_thumbnail($post, $default=null) {
 
 
 function helper_content($url, $post=null) {
+	if ($realpath = realpath($url)) {
+		ob_start();
+		include $realpath;
+		return ob_get_clean();
+	}
 	$ch = curl_init();
 	curl_setopt ($ch, CURLOPT_URL, $url);
 	curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -312,13 +317,26 @@ function helper_content($url, $post=null) {
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 	$return = curl_exec($ch);
-	// if (curl_errno($ch)) {
-	// 	$return = 'Error: '. curl_error($ch);
-	// }
 	curl_close($ch);
 	return $return;
 }
 
+
+function helper_url_merge($url) {
+	$url = parse_url($url);
+	$url['query'] = isset($url['query'])? $url['query']: null;
+	parse_str($url['query'], $url['query']);
+	$url['query'] = array_merge($_GET, $url['query']);
+	$url2 = (isset($_SERVE['HTTPS']) AND $_SERVE['HTTPS']=='on')? 'https://': 'http://';
+	$url2 .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$url2 = parse_url($url2);
+	parse_str($url2['query'], $url2['query']);
+	$url['query'] = array_merge($url['query'], $url2['query']);
+	$url['query'] = http_build_query($url['query']);
+	$url2['query'] = http_build_query($url2['query']);
+	$url = array_merge($url2, $url);
+	return "{$url['scheme']}://{$url['host']}{$url['path']}" . ($url['query']? "?{$url['query']}": null);
+}
 
 
 
