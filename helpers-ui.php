@@ -4,6 +4,25 @@
 class Ui
 {
 
+	static function _attrs($atts=null, $defs=null)
+	{
+		if (is_string($atts)) parse_str($atts, $atts);
+		$atts['class'] = isset($atts['class'])? $atts['class']: null;
+		$atts['class'] = explode(' ', $atts['class']);
+
+		if (is_string($defs)) parse_str($defs, $defs);
+		$defs['class'] = isset($defs['class'])? $defs['class']: null;
+		$defs['class'] = explode(' ', $defs['class']);
+		foreach($defs['class'] as $cl) $atts['class'][] = $cl;
+		unset($defs['class']);
+		$atts['class'] = implode(' ', array_filter($atts['class'], 'strlen'));
+
+		$atts = array_merge($defs, $atts);
+		return implode(' ', array_map(function($key, $val) {
+			return "{$key}=\"{$val}\"";
+		}, array_keys($atts), $atts));
+	}
+
 	static function uploader($attr=null)
 	{
 		$id = uniqid(rand(), true);
@@ -93,5 +112,18 @@ class Ui
 		</script>
 		<?php
 	}
+
+
+
+	static function cep($attrs=null) {
+		$id = uniqid('ui-cep-'.rand());
+		$attrs = self::_attrs($attrs, array(
+			'class' => 'form-control',
+			'value' => '',
+			'type' => 'text',
+			'id' => $id,
+		)); ?>
+		<input <?php echo $attrs; ?>>
+	<?php }
 
 }

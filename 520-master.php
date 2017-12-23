@@ -227,6 +227,8 @@ add_action('admin_menu', function() {
 			$settings = is_array($settings)? $settings: array();
 			foreach($_POST as $key=>$val) $settings[$key] = $val;
 			update_option('cdz_options', $settings);
+			cdz_flash('success', 'Configurações salvas');
+			die("<script>location.href='{$_SERVER['HTTP_REFERRER']}';</script>");
 		}
 
 		cdz_header(); ?>
@@ -483,3 +485,19 @@ add_shortcode('collection', function($atts=null, $content=null) {
 	}
 	return ob_get_clean();
 });
+
+
+
+function cdz_assets($path) {
+	return plugin_dir_url(__FILE__) . ltrim($path, '/');
+}
+
+
+function cdz_assets_render() { ?>
+<link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__); ?>assets/520.css">
+<script src="<?php echo plugin_dir_url(__FILE__); ?>assets/520.js"></script>
+<?php }
+add_action('admin_footer', 'cdz_assets_render');
+add_action('wp_footer', 'cdz_assets_render');
+
+

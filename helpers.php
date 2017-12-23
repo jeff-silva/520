@@ -339,6 +339,43 @@ function helper_url_merge($url) {
 }
 
 
+function cdz_flash($class=null, $text=null) {
+	if(! session_id()) session_start();
+	$_SESSION['cdz_flash'] = isset($_SESSION['cdz_flash'])? $_SESSION['cdz_flash']: array();
+
+	if ($class AND $text) {
+		$_SESSION['cdz_flash'][$class] = isset($_SESSION['cdz_flash'][$class])? $_SESSION['cdz_flash'][$class]: array();
+		$_SESSION['cdz_flash'][$class][] = $text;
+	}
+
+	else if ($class AND !$text) {
+		return isset($_SESSION['cdz_flash'][$class])? $_SESSION['cdz_flash'][$class]: null;
+	}
+
+	return $_SESSION['cdz_flash'];
+}
+
+
+
+function cdz_flash_render() {
+	if (! empty($classes = cdz_flash())) { ?>
+	<div class="cdz-flash" style="position:fixed; top:40px; left:20%; width:60%; z-index:99999999 !important;">
+		<?php foreach($classes as $class=>$flashes): ?>
+		<div class="alert alert-success">
+			<a href="javascript:;" style="float:right; color:#222;" onclick="$(this).closest('.cdz-flash').fadeOut(200);">&times;</a>
+			<?php echo implode('<br>', $flashes); ?>
+		</div>
+		<?php endforeach; ?>
+	</div>
+	<?php if(! session_id()) session_start();
+		$_SESSION['cdz_flash'] = array();
+	}
+}
+add_action('admin_footer', 'cdz_flash_render');
+add_action('wp_footer', 'cdz_flash_render');
+
+
+
 
 // Remove window._wpemojiSettings from HTML
 add_action('init', function() {
