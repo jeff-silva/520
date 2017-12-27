@@ -115,15 +115,16 @@ function cdz_update() {
 
 	// Download zip
 	include __DIR__ . '/libs/PclZip.php';
-	if (file_exists(__DIR__ . '/download.zip')) unlink(__DIR__ . '/download.zip');
+	if (file_exists(__DIR__ . '/_download.zip')) unlink(__DIR__ . '/_download.zip');
 	$content = helper_content('https://github.com/jeff-silva/520/archive/master.zip');
-	file_put_contents(__DIR__ . '/download.zip', $content);
+	file_put_contents(__DIR__ . '/_download.zip', $content);
 
 
 	// Delete all, except zip
 	if (!function_exists('cdz_delete_all_files')) {
 		function cdz_delete_all_files($glob, $files=array(), $level=0) {
 			foreach(glob($glob) as $file) {
+				if (basename($file) == '_download.zip') continue;
 				if (is_dir($file)) {
 					$files = cdz_delete_all_files($file . '/*', $files, $level+1);
 				}
@@ -131,23 +132,22 @@ function cdz_update() {
 			}
 			if ($level==0) {
 				foreach($files as $file) {
-					if ($file == __DIR__ . DIRECTORY_SEPARATOR. 'download.zip') continue;
-					if (is_dir($file)) rmdir($file);
-					else unlink($file);
+					// if (is_dir($file)) rmdir($file);
+					// else unlink($file);
 				}
 			}
 			return $files;
 		}
 	}
-	cdz_delete_all_files(__DIR__ . '/*');
+	$deleteds = cdz_delete_all_files(__DIR__ . '/*');
 
 
 	// Extract zip
-	$zip = new PclZip(__DIR__ . '/download.zip');
+	$zip = new PclZip(__DIR__ . '/_download.zip');
 	$return = $zip->extract(PCLZIP_OPT_PATH, __DIR__, PCLZIP_OPT_REMOVE_PATH, '520-master', PCLZIP_OPT_REPLACE_NEWER);
 
 	// Delete zip
-	unlink(__DIR__ . '/download.zip');
+	unlink(__DIR__ . '/_download.zip');
 	return $return? true: false;
 }
 
@@ -228,7 +228,7 @@ add_action('admin_menu', function() {
 			foreach($_POST as $key=>$val) $settings[$key] = $val;
 			update_option('cdz_options', $settings);
 			cdz_flash('success', 'Configurações salvas');
-			die("<script>location.href='{$_SERVER['HTTP_REFERRER']}';</script>");
+			echo "<script>location.href='{$_SERVER['HTTP_REFERRER']}';</script>"; die;
 		}
 
 		cdz_header(); ?>
