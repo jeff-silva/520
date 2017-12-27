@@ -305,19 +305,29 @@ function helper_thumbnail($post, $default=null) {
 
 
 function helper_content($url, $post=null) {
+	if (is_array($post)) {
+		die("Curl Post: " . json_encode($post));
+	}
+
 	if ($realpath = realpath($url)) {
 		ob_start();
 		include $realpath;
 		return ob_get_clean();
 	}
-	$ch = curl_init();
-	curl_setopt ($ch, CURLOPT_URL, $url);
-	curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5);
-	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-	$return = curl_exec($ch);
-	curl_close($ch);
+
+	$return = file_get_contents($url);
+
+	if (! $return) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		$return = curl_exec($ch);
+		curl_close($ch);
+	}
+
 	return $return;
 }
 
