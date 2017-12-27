@@ -21,7 +21,8 @@ cdz_settings_tab('Módulos', '520-settings-modules', function() {
 	</div>
 	<?php else: ?>
 	<div class="text-right">
-		<a href="<?php echo helper_url_merge('?update-core=1'); ?>" class="btn btn-xs text-muted" onclick="return confirm('Forçar atualização?');">Atualizado</a>
+		<a href="<?php echo helper_url_merge('?update-core=1'); ?>" class="btn btn-xs btn-success text-muted" onclick="return confirm('Forçar atualização?');">Atualizado</a>
+		<br><small class="text-muted">Próxima verificação: <?php echo date('d/m/y - H:i:s', cdz_option('update_time')); ?></small>
 	</div>
 	<?php endif; ?>
 
