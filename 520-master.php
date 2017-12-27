@@ -501,3 +501,15 @@ add_action('admin_footer', 'cdz_assets_render');
 add_action('wp_footer', 'cdz_assets_render');
 
 
+// edit_form_after_editor || edit_form_advanced
+add_action('edit_form_after_editor', function() {
+	global $post;
+	if ($template = get_page_template_slug($post->ID)) {
+		$template_dir = get_template_directory();
+		$help = "<div title='include: {$template_dir}/postmeta/{$template}' style='color:#ccc;'>--</div>";
+		if ($template = realpath("{$template_dir}/postmeta/{$template}")) {
+			include $template;
+		}
+		else echo $help;
+	}
+});
