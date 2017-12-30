@@ -1,5 +1,6 @@
 <?php
 
+if(! session_id()) session_start();
 
 if (! function_exists('dd')) {
 	function dd() {
@@ -350,7 +351,6 @@ function helper_url_merge($url) {
 
 
 function cdz_flash($class=null, $text=null) {
-	if(! session_id()) session_start();
 	$_SESSION['cdz_flash'] = isset($_SESSION['cdz_flash'])? $_SESSION['cdz_flash']: array();
 
 	if ($class AND $text) {
@@ -372,7 +372,7 @@ function cdz_flash_render() {
 	<div class="cdz-flash" style="position:fixed; top:40px; left:20%; width:60%; z-index:99999999 !important;">
 		<?php foreach($classes as $class=>$flashes): ?>
 		<div class="alert alert-success">
-			<a href="javascript:;" style="float:right; color:#222;" onclick="$(this).closest('.cdz-flash').fadeOut(200);">&times;</a>
+			<a href="javascript:;" style="float:right; color:#222;" onclick="jQuery(this).closest('.cdz-flash').fadeOut(200);">&times;</a>
 			<?php echo implode('<br>', $flashes); ?>
 		</div>
 		<?php endforeach; ?>
