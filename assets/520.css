@@ -4,3 +4,9 @@
 
 /* Cover */
 .cover {width:200px; height:200px; display:block; background: url() no-repeat center center; background-size:cover;}
+
+/* Sizes */
+@media (min-width:0px) and (max-width:768px) {}
+@media (min-width:769px) and (max-width:992px) {}
+@media (min-width:993px) and (max-width:1200px) {}
+@media (min-width:1201px) {}

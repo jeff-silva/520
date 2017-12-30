@@ -410,3 +410,7 @@ add_action('init', function() {
 	});
 });
 
+
+function helper_redirect($url) {
+	echo "<script>location.href='{$url}';</script>"; die;
+}
