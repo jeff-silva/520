@@ -1,5 +1,6 @@
 <?php
 
+include __DIR__ . '/views/520-settings-database.php';
 include __DIR__ . '/views/520-settings-contact-newsletter.php';
 include __DIR__ . '/views/520-settings-basic.php';
 include __DIR__ . '/views/520-settings-dependencies.php';

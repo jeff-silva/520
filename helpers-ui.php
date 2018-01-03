@@ -224,6 +224,34 @@ class Ui
 		<input <?php echo $attrs; ?>>
 	<?php }
 
+
+
+	static function postform($call=null) {
+		$id = uniqid('ui_postform_'.rand());
+		$attrs = self::_attrs($attrs, array(
+			'method' => 'post',
+			'id' => $id,
+			'submit' => "return {$id}_submit(this);",
+		)); ?>
+		<form <?php echo $attrs; ?>>
+			<?php call_user_func($call); ?>
+		</form>
+		<script>
+		<?php echo "function {$id}_submit(form) {"; ?> 
+			var $form = $(this);
+			$form.attr("autocomplete", "off");
+			var post = {postform:1};
+			$.map($form.serializeArray(), function(n, i) { post[n['name']] = n['value']; });
+			$form.find(".ajax-response").empty();
+			$.post("<?php echo site_url(); ?>", post, function(response) {
+				$(form).find(".ajax-response").html(response);
+			});
+			return false;
+		<?php echo "}"; ?> 
+		</script>
+		<?php
+	}
+
 }
 
 
