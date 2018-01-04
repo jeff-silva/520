@@ -316,7 +316,9 @@ function helper_content($url, $post=null) {
 		return ob_get_clean();
 	}
 
-	$return = file_get_contents($url);
+	$return = file_get_contents($url, false, stream_context_create(array(
+		'http' => array('ignore_errors' => true),
+	)));
 
 	if (! $return) {
 		$ch = curl_init();

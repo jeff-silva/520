@@ -251,7 +251,7 @@ class Ui
 			'lng' => '',
 		), $value);
 
-		$content = is_callable($content)? $content: function($value) { ?>
+		$content = is_callable($content)? $content: function($value, $id) { ?>
 		<div style="display:none;">
 			<input type="text" data-addr="state" value="<?php echo $value['state']; ?>" class="form-control" placeholder="Estado">
 			<input type="text" data-addr="country" value="<?php echo $value['country']; ?>" class="form-control" placeholder="País">
@@ -259,8 +259,8 @@ class Ui
 			<input type="text" data-addr="lng" value="<?php echo $value['lng']; ?>" class="form-control" placeholder="lng">
 		</div>
 		<div class="row">
-			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="postal" value="<?php echo $value['postal']; ?>" class="form-control" placeholder="CEP" onchange="ui_address_postal_autocomplete(this);"></div>
-			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="route" value="<?php echo $value['route']; ?>" class="form-control ui_address_search" placeholder="Rua" onchange="ui_address_postal_autocomplete(this);"></div>
+			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="postal" value="<?php echo $value['postal']; ?>" class="form-control" placeholder="CEP" onchange="ui_address_postal_autocomplete('#<?php echo $id; ?>', this);"></div>
+			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="route" value="<?php echo $value['route']; ?>" class="form-control ui_address_search" placeholder="Rua" onchange="ui_address_postal_autocomplete('#<?php echo $id; ?>', this);"></div>
 			<div class="col-xs-6  col-sm-4"><input type="text" data-addr="number" value="<?php echo $value['number']; ?>" class="form-control" placeholder="Nº"></div>
 			<div class="col-xs-6  col-sm-4"><input type="text" data-addr="complement" value="<?php echo $value['complement']; ?>" class="form-control" placeholder="Complemento"></div>
 			<div class="col-xs-6  col-sm-8"><input type="text" data-addr="district" value="<?php echo $value['district']; ?>" class="form-control" placeholder="Bairro"></div>
@@ -271,10 +271,10 @@ class Ui
 		<?php }; ?>
 		<div id="<?php echo $id; ?>" class="ui_address">
 			<textarea <?php echo $attrs; ?>><?php echo json_encode($value); ?></textarea>
-			<?php call_user_func($content, $value); ?>
+			<?php call_user_func($content, $value, $id); ?>
 		</div>
 		<style>
-		.ui_address .form-control {width:100%; margin-bottom:5px;}
+		.ui_address .form-control {width:100% !important; margin-bottom:5px;}
 		.ui_address .row {padding:0px 13px;}
 		.ui_address .row>* {padding:0px 2px;}
 		.pac-container {z-index:9999 !important}
@@ -289,13 +289,13 @@ class Ui
 			for(var i in addr) { $parent.find("[data-addr="+i+"]").val(addr[i]); }
 		};
 
-		var ui_address_postal_autocomplete = function(el) {
+		var ui_address_postal_autocomplete = function(parent, el) {
 			var $=jQuery;
 			$(el).parent().addClass("ui_address_loading");
 			$.get("<?php echo site_url("/?ui_address_search&search="); ?>"+el.value, function(resp) {
 				$(el).parent().removeClass("ui_address_loading");
 				if (resp.error) { alert(resp.error); }
-				else ui_address_postal_populate("#<?php echo $id; ?>", resp);
+				else ui_address_postal_populate(parent, resp);
 			}, "json");
 		};
 
@@ -361,12 +361,11 @@ add_action('init', function() {
 			$parse['query']['language'] = 'pt-BR';
 			$parse['query'] = http_build_query($parse['query']);
 			$path = trim("{$parse['path']}?{$parse['query']}", '/');
-			$data = helper_content("https://maps.googleapis.com/maps/api/place/{$path}");
-			return json_decode($data, true);
+			$data = helper_content($url = "https://maps.googleapis.com/maps/api/place/{$path}");
+			$data = json_decode($data, true);
+			$data['url'] = $url;
+			return $data;
 		}
-
-		// places_search('/textsearch/json?query=address name');
-		// places_search('/details/json?placeid=ChIJhd6Ut3CFpgARv1XfWQuGeJ4');
 
 		$json = array(
 			'error'=>null,
