@@ -371,7 +371,7 @@ function cdz_flash_render() {
 	if (! empty($classes = cdz_flash())) { ?>
 	<div class="cdz-flash" style="position:fixed; top:40px; left:20%; width:60%; z-index:99999999 !important;">
 		<?php foreach($classes as $class=>$flashes): ?>
-		<div class="alert alert-success">
+		<div class="alert alert-<?php echo $class; ?>">
 			<a href="javascript:;" style="float:right; color:#222;" onclick="jQuery(this).closest('.cdz-flash').fadeOut(200);">&times;</a>
 			<?php echo implode('<br>', $flashes); ?>
 		</div>
@@ -412,5 +412,6 @@ add_action('init', function() {
 
 
 function helper_redirect($url) {
+	$url = $url=='back'? $_SERVER['HTTP_REFERER']: $url;
 	echo "<script>location.href='{$url}';</script>"; die;
 }

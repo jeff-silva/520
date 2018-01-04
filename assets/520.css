@@ -5,6 +5,14 @@
 /* Cover */
 .cover {width:200px; height:200px; display:block; background: url() no-repeat center center; background-size:cover;}
 
+/* Loading spinners | https://stephanwagner.me/only-css-loading-spinner */
+@keyframes spinner { to {transform: rotate(360deg);} }
+.spinner-01:before {content: ''; box-sizing: border-box; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; border-radius: 50%; border: 2px solid #ccc; border-top-color: #333; animation: spinner .6s linear infinite;}
+.spinner-02:before {content: ''; box-sizing: border-box; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; margin-top: -15px; margin-left: -15px; border-radius: 50%; border: 1px solid #ccc; border-top-color: #07d; animation: spinner .6s linear infinite;}
+.spinner-03:before {content: ''; box-sizing: border-box; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; border-radius: 50%; border: 2px solid transparent; border-top-color: #07d; border-bottom-color: #07d; animation: spinner .8s ease infinite;}
+.spinner-04:before {content: ''; box-sizing: border-box; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; border-radius: 50%; border-top: 2px solid #07d; border-right: 2px solid transparent; animation: spinner .6s linear infinite;}
+.spinner-05:before {content: ''; box-sizing: border-box; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; border-radius: 50%; border: 1px solid #f6f; border-top-color: #0e0; border-right-color: #0dd; border-bottom-color: #f90; animation: spinner .6s linear infinite;}
+
 /* Sizes */
 @media (min-width:0px) and (max-width:768px) {}
 @media (min-width:769px) and (max-width:992px) {}
