@@ -268,6 +268,7 @@ class Ui
 			<div class="col-xs-6  col-sm-2"><input type="text" data-addr="state_short" value="<?php echo $value['state_short']; ?>" class="form-control" placeholder="Estado"></div>
 			<div class="col-xs-6  col-sm-2"><input type="text" data-addr="country_short" value="<?php echo $value['country_short']; ?>" class="form-control" placeholder="País"></div>
 		</div>
+		<small class="text-muted" data-addr="formatted"><?php echo $value['formatted']; ?></small>
 		<?php }; ?>
 		<div id="<?php echo $id; ?>" class="ui_address">
 			<textarea <?php echo $attrs; ?>><?php echo json_encode($value); ?></textarea>
@@ -285,8 +286,15 @@ class Ui
 		var ui_address_postal_populate = function(parent, addr) {
 			var $=jQuery;
 			var $parent = $(parent);
+			addr.formatted = (addr.route||"");
+			if (addr.number) addr.formatted += " Nº "+(addr.number||"");
+			if (addr.complement) addr.formatted += ", "+(addr.complement||"");
+			if (addr.postal) addr.formatted += ", CEP "+(addr.postal||"");
+			if (addr.district) addr.formatted += ", "+(addr.district||"");
+			if (addr.city && addr.state_short) addr.formatted += " - "+(addr.city||"")+"/"+(addr.state_short||"");
 			$parent.find("textarea").val(JSON.stringify(addr));
 			for(var i in addr) { $parent.find("[data-addr="+i+"]").val(addr[i]); }
+			$parent.find("[data-addr=formatted]").html(addr.formatted);
 		};
 
 		var ui_address_postal_autocomplete = function(parent, el) {
@@ -301,7 +309,7 @@ class Ui
 
 		jQuery(document).ready(function($) {
 			var $parent = $("#<?php echo $id; ?>");
-			$parent.find("[data-addr]").on("change", function() {
+			$parent.find("[data-addr]").on("change input", function() {
 				var ktype = $(this).attr("data-addr");
 				var addr = $parent.find("textarea").val();
 				try { eval('addr='+addr); } catch(e) { addr={}; }
@@ -387,7 +395,6 @@ add_action('init', function() {
 		$resp1 = places_search("/textsearch/json?query={$params['search']}");
 		if (isset($resp1['results'][0]['place_id'])) {
 			$resp2 = places_search("/details/json?placeid={$resp1['results'][0]['place_id']}");
-			$json['formatted'] = $resp2['result']['formatted_address'];
 			$json['lat'] = $resp2['result']['geometry']['location']['lat'];
 			$json['lng'] = $resp2['result']['geometry']['location']['lng'];
 			foreach($resp2['result']['address_components'] as $comp) {
@@ -417,6 +424,15 @@ add_action('init', function() {
 			}
 		}
 
+
+		if (!$json['route'] AND !$json['postal']) {
+			$resp3 = helper_content("https://viacep.com.br/ws/{$params['search']}/json/");
+			$resp3 = json_decode($resp3, true);
+			$json['route'] = $resp3['logradouro'];
+			$json['postal'] = $resp3['cep'];
+		}
+
+
 		if (! $json['route']) {
 			$resp3 = helper_content("https://viacep.com.br/ws/{$json['postal']}/json/");
 			$resp3 = json_decode($resp3, true);
@@ -433,6 +449,12 @@ add_action('init', function() {
 				$json['postal'] = $resp3[0]['cep'];
 			}
 		}
+
+		$json['formatted'] = $json['route'];
+		if ($json['number']) $json['formatted'] .= " Nº {$json['number']}";
+		if ($json['postal']) $json['formatted'] .= " CEP {$json['postal']}";
+		if ($json['district']) $json['formatted'] .= ", {$json['district']}";
+		$json['formatted'] .= " - {$json['city']}/{$json['state_short']}";
 
 		echo json_encode($json); die;
 	}
