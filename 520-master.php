@@ -132,8 +132,8 @@ function cdz_update() {
 			}
 			if ($level==0) {
 				foreach($files as $file) {
-					// if (is_dir($file)) rmdir($file);
-					// else unlink($file);
+					if (is_dir($file)) rmdir($file);
+					else unlink($file);
 				}
 			}
 			return $files;
