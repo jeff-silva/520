@@ -1,3 +1,10 @@
 {
-	"version": "0.0.41"
+	"version": "0.0.41",
+	"news": [
+		{
+			"date": "2018-01-08",
+			"title": "Suporte à notícias",
+			"text": "Acompanhamento de novidades e releases.",
+		},
+	]
 }

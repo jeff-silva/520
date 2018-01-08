@@ -45,7 +45,7 @@ cdz_settings_tab('Módulos', '520-settings-modules', function() {
 			</ul>
 		</div>
 		<div class="col-xs-6">
-			<pre><?php include __520DIR__ . '/info.txt'; ?></pre>
+			--
 		</div>
 	</div>
 
