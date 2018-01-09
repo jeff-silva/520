@@ -5,7 +5,9 @@ if(! session_id()) session_start();
 if (! function_exists('dd')) {
 	function dd() {
 		foreach(func_get_args() as $data) {
-			echo '<pre style="font:11px monospace;">'. print_r($data, true) .'</pre>';
+			if (is_bool($data)) { $data = $data? 'true': 'false'; }
+			else $data = print_r($data, true);
+			echo '<pre style="font:11px monospace;">'. $data .'</pre>';
 		}
 	}
 }
@@ -416,4 +418,51 @@ add_action('init', function() {
 function helper_redirect($url) {
 	$url = $url=='back'? $_SERVER['HTTP_REFERER']: $url;
 	echo "<script>location.href='{$url}';</script>"; die;
+}
+
+
+function helper_email($to, $subject, $body, $attachments=array()) {
+
+	if (in_array($to, array('admin', 'admin_email'))) {
+		$to = get_option('admin_email');
+	}
+
+	else if (in_array($to, array('me')) AND $user = wp_get_current_user()) {
+		$to = $user->user_email;
+	}
+
+	$attachments = is_array($attachments)? $attachments: explode("\n", $attachments);
+	$headers = array('Content-Type: text/html; charset=UTF-8');
+	return wp_mail($to, $subject, $body, $headers, $attachments);
+}
+
+
+
+// Array
+// (
+//     [basedir] => /home/path/wp-content/uploads/{$dirname}
+//     [baseurl] => http://projetos.jsiqueira.com/primecarros/wp-content/uploadshttp://projetos.jsiqueira.com/primecarros/wp-content/uploads/{$dirname}
+//     [basedir_file] => /home/path/wp-content/uploads/{$filename}
+//     [baseurl_file] => http://projetos.jsiqueira.com/primecarros/wp-content/uploads/{$filename}
+// )
+function helper_upload_put_contents($filename, $content) {
+	$upload = wp_upload_dir();
+	unset($upload['path'], $upload['url'], $upload['subdir'], $upload['error']);
+
+	$dirname = dirname(ltrim($filename, '/'));
+	$filename = ltrim($filename, '/');
+
+	$upload['basedir_file'] = "{$upload['basedir']}/{$filename}";
+	$upload['basedir'] = "{$upload['basedir']}/{$dirname}";
+	$upload['baseurl_file'] = "{$upload['baseurl']}/{$filename}";
+	$upload['baseurl'] = "{$upload['baseurl']}/{$dirname}";
+
+	if (! realpath($upload['basedir'])) mkdir($upload['basedir'], 0755, true);
+	if (file_put_contents($upload['basedir_file'], $content)) {
+		return array(
+			'path' => $upload['basedir_file'],
+			'url' => $upload['baseurl_file'],
+		);
+	}
+	return false;
 }
