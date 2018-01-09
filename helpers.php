@@ -431,20 +431,22 @@ function helper_email($to, $subject, $body, $attachments=array()) {
 		$to = $user->user_email;
 	}
 
-	$attachments = is_array($attachments)? $attachments: explode("\n", $attachments);
 	$headers = array('Content-Type: text/html; charset=UTF-8');
 	return wp_mail($to, $subject, $body, $headers, $attachments);
 }
 
 
 
-// Array
-// (
-//     [basedir] => /home/path/wp-content/uploads/{$dirname}
-//     [baseurl] => http://projetos.jsiqueira.com/primecarros/wp-content/uploadshttp://projetos.jsiqueira.com/primecarros/wp-content/uploads/{$dirname}
-//     [basedir_file] => /home/path/wp-content/uploads/{$filename}
-//     [baseurl_file] => http://projetos.jsiqueira.com/primecarros/wp-content/uploads/{$filename}
-// )
+/**
+ *
+ * @param      <string>   $filename  The filename
+ * @param      <string>   $content   The content
+ *
+ * @return array (
+ *     [path] => /home/path/wp-content/uploads/{$dirname}
+ *     [url] => http://site.com/wp-content/uploads/{$dirname}
+ * )
+ */
 function helper_upload_put_contents($filename, $content) {
 	$upload = wp_upload_dir();
 	unset($upload['path'], $upload['url'], $upload['subdir'], $upload['error']);
