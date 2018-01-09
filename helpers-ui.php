@@ -259,7 +259,7 @@ class Ui
 			<input type="text" data-addr="lng" value="<?php echo $value['lng']; ?>" class="form-control" placeholder="lng">
 		</div>
 		<div class="row">
-			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="postal" value="<?php echo $value['postal']; ?>" class="form-control" placeholder="CEP" onchange="ui_address_postal_autocomplete('#<?php echo $id; ?>', this);"></div>
+			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="postal" value="<?php echo $value['postal']; ?>" class="form-control" placeholder="CEP" onchange="ui_address_postal_autocomplete('#<?php echo $id; ?>', this);" data-mask="99999-999"></div>
 			<div class="col-xs-12 col-sm-8"><input type="text" data-addr="route" value="<?php echo $value['route']; ?>" class="form-control ui_address_search" placeholder="Rua" onchange="ui_address_postal_autocomplete('#<?php echo $id; ?>', this);"></div>
 			<div class="col-xs-6  col-sm-4"><input type="text" data-addr="number" value="<?php echo $value['number']; ?>" class="form-control" placeholder="Nº"></div>
 			<div class="col-xs-6  col-sm-4"><input type="text" data-addr="complement" value="<?php echo $value['complement']; ?>" class="form-control" placeholder="Complemento"></div>
@@ -375,6 +375,45 @@ add_action('init', function() {
 			return $data;
 		}
 
+		function places_extract_parts($json, $result=null) {
+			if (is_array($result) AND isset($result['result'])) {
+				$json['lat'] = $result['result']['geometry']['location']['lat'];
+				$json['lng'] = $result['result']['geometry']['location']['lng'];
+				foreach($result['result']['address_components'] as $comp) {
+					if ($comp['types'][0]=='postal_code') {
+						$json['postal'] = $comp['long_name'];
+					}
+					else if ($comp['types'][0]=='sublocality_level_1') {
+						$json['district'] = $comp['long_name'];
+					}
+					else if ($comp['types'][0]=='route') {
+						$json['route'] = $comp['long_name'];
+					}
+					else if ($comp['types'][0]=='street_number') {
+						$json['number'] = $comp['long_name'];
+					}
+					else if ($comp['types'][0]=='administrative_area_level_2') {
+						$json['city'] = $comp['long_name'];
+					}
+					else if ($comp['types'][0]=='administrative_area_level_1') {
+						$json['state'] = $comp['long_name'];
+						$json['state_short'] = $comp['short_name'];
+					}
+					else if ($comp['types'][0]=='country') {
+						$json['country'] = $comp['long_name'];
+						$json['country_short'] = $comp['short_name'];
+					}
+				}
+			}
+
+			$json['formatted'] = $json['route'];
+			if ($json['number']) $json['formatted'] .= " Nº {$json['number']}";
+			if ($json['postal']) $json['formatted'] .= " CEP {$json['postal']}";
+			if ($json['district']) $json['formatted'] .= ", {$json['district']}";
+			$json['formatted'] .= " - {$json['city']}/{$json['state_short']}";
+			return $json;
+		}
+
 		$json = array(
 			'error'=>null,
 			'route'=>null,
@@ -392,69 +431,51 @@ add_action('init', function() {
 		);
 
 
-		$resp1 = places_search("/textsearch/json?query={$params['search']}");
-		if (isset($resp1['results'][0]['place_id'])) {
-			$resp2 = places_search("/details/json?placeid={$resp1['results'][0]['place_id']}");
-			$json['lat'] = $resp2['result']['geometry']['location']['lat'];
-			$json['lng'] = $resp2['result']['geometry']['location']['lng'];
-			foreach($resp2['result']['address_components'] as $comp) {
-				if ($comp['types'][0]=='postal_code') {
-					$json['postal'] = $comp['long_name'];
-				}
-				else if ($comp['types'][0]=='sublocality_level_1') {
-					$json['district'] = $comp['long_name'];
-				}
-				else if ($comp['types'][0]=='route') {
-					$json['route'] = $comp['long_name'];
-				}
-				else if ($comp['types'][0]=='street_number') {
-					$json['number'] = $comp['long_name'];
-				}
-				else if ($comp['types'][0]=='administrative_area_level_2') {
-					$json['city'] = $comp['long_name'];
-				}
-				else if ($comp['types'][0]=='administrative_area_level_1') {
-					$json['state'] = $comp['long_name'];
-					$json['state_short'] = $comp['short_name'];
-				}
-				else if ($comp['types'][0]=='country') {
-					$json['country'] = $comp['long_name'];
-					$json['country_short'] = $comp['short_name'];
+		if ($params['search']) {
+
+			// pesquisa por endereço
+			if (preg_match('/[a-z]/', $params['search'])) {
+				$resp1 = places_search("/textsearch/json?query={$params['search']}");
+				if (isset($resp1['results'][0]['place_id'])) {
+					$resp2 = places_search("/details/json?placeid={$resp1['results'][0]['place_id']}");
+					$json = places_extract_parts($json, $resp2);
+
+					if (! $json['postal']) {
+						$resp3 = str_replace(' ', '%20', "https://viacep.com.br/ws/{$json['state_short']}/{$json['city']}/{$json['route']}/json/");
+						$resp3 = json_decode(helper_content($resp3), true);
+						if (isset($resp3[0]['cep'])) {
+							$json['postal'] = $resp3[0]['cep'];
+						}
+					}
+
 				}
 			}
-		}
 
-
-		if (!$json['route'] AND !$json['postal']) {
-			$resp3 = helper_content("https://viacep.com.br/ws/{$params['search']}/json/");
-			$resp3 = json_decode($resp3, true);
-			$json['route'] = $resp3['logradouro'];
-			$json['postal'] = $resp3['cep'];
-		}
-
-
-		if (! $json['route']) {
-			$resp3 = helper_content("https://viacep.com.br/ws/{$json['postal']}/json/");
-			$resp3 = json_decode($resp3, true);
-			if (isset($resp3['logradouro'])) {
-				$json['route'] = $resp3['logradouro'];
+			// pesquisa por cep
+			else {
+				$resp1 = helper_content("https://viacep.com.br/ws/{$params['search']}/json/");
+				$resp1 = json_decode($resp1, true);
+				if ($resp1['logradouro'] OR $resp1['bairro'] OR $resp1['uf']) {
+					$json['postal'] = $resp1['cep'];
+					$json['route'] = $resp1['logradouro'];
+					$json['district'] = $resp1['bairro'];
+					$resp2 = places_search("/textsearch/json?query={$resp1['logradouro']}+{$resp1['bairro']}+{$resp1['uf']}");
+					if (isset($resp2['results'][0]['place_id'])) {
+						$resp3 = places_search("/details/json?placeid={$resp2['results'][0]['place_id']}");
+						$json = places_extract_parts($json, $resp3);
+					}
+				}
 			}
-		}
 
-		if (! $json['postal']) {
-			$url = str_replace(' ', '%20', "https://viacep.com.br/ws/{$json['state_short']}/{$json['city']}/{$json['route']}/json/");
-			$resp3 = helper_content($url);
-			$resp3 = json_decode($resp3, true);
-			if (isset($resp3[0]['cep'])) {
-				$json['postal'] = $resp3[0]['cep'];
-			}
+			// if (! $json['postal']) {
+			// 	$url = str_replace(' ', '%20', "https://viacep.com.br/ws/{$json['state_short']}/{$json['city']}/{$json['route']}/json/");
+			// 	$resp3 = helper_content($url);
+			// 	$resp3 = json_decode($resp3, true);
+			// 	if (isset($resp3[0]['cep'])) {
+			// 		$json['postal'] = $resp3[0]['cep'];
+			// 	}
+			// }
 		}
-
-		$json['formatted'] = $json['route'];
-		if ($json['number']) $json['formatted'] .= " Nº {$json['number']}";
-		if ($json['postal']) $json['formatted'] .= " CEP {$json['postal']}";
-		if ($json['district']) $json['formatted'] .= ", {$json['district']}";
-		$json['formatted'] .= " - {$json['city']}/{$json['state_short']}";
 
 		echo json_encode($json); die;
 	}
