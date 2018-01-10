@@ -10,11 +10,11 @@
 
 /* Loading spinners | https://stephanwagner.me/only-css-loading-spinner */
 @keyframes _spinner { to {transform: rotate(360deg);} }
-.loading-01:before {content:''; display:inline-block; width:20px; height:20px; margin:5px 5px -5px 5px; border-radius:50%; border:2px solid #ccc; border-top-color: #333; animation: _spinner .6s linear infinite;}
-.loading-02:before {content:''; display:inline-block; width:20px; height:20px; margin:5px 5px -5px 5px; border-radius:50%; border:1px solid #ccc; border-top-color: #07d; animation: _spinner .6s linear infinite;}
-.loading-03:before {content:''; display:inline-block; width:20px; height:20px; margin:5px 5px -5px 5px; border-radius:50%; border: 2px solid transparent; border-top-color: #07d; border-bottom-color: #07d; animation: _spinner .6s linear infinite;}
-.loading-04:before {content:''; display:inline-block; width:20px; height:20px; margin:5px 5px -5px 5px; border-radius:50%; border-top: 2px solid #07d; border-right: 2px solid transparent; animation: _spinner .6s linear infinite;}
-.loading-05:before {content:''; display:inline-block; width:20px; height:20px; margin:5px 5px -5px 5px; border-radius:50%; border: 1px solid #f6f; border-top-color: #0e0; border-right-color: #0dd; border-bottom-color: #f90; animation: _spinner .6s linear infinite;}
+.loading-01:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border:2px solid #ccc; border-top-color: #333; animation: _spinner .6s linear infinite;}
+.loading-02:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border:1px solid #ccc; border-top-color: #07d; animation: _spinner .6s linear infinite;}
+.loading-03:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border: 2px solid transparent; border-top-color: #07d; border-bottom-color: #07d; animation: _spinner .6s linear infinite;}
+.loading-04:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border-top: 2px solid #07d; border-right: 2px solid transparent; animation: _spinner .6s linear infinite;}
+.loading-05:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border: 1px solid #f6f; border-top-color: #0e0; border-right-color: #0dd; border-bottom-color: #f90; animation: _spinner .6s linear infinite;}
 
 /* Sizes */
 @media (min-width:0px) and (max-width:768px) {}
