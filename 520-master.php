@@ -148,6 +148,8 @@ function cdz_update() {
 
 	// Delete zip
 	unlink(__DIR__ . '/_download.zip');
+	cdz_option_update('update_time', (time() + (60*60*24)));
+
 	return $return? true: false;
 }
 
@@ -304,7 +306,6 @@ add_action('init', function() {
 	// Automatic update
 	if ($update_time = cdz_option('update_time')) {
 		if (time() > $update_time) {
-			cdz_option_update('update_time', (time() + (60*60*24)));
 			cdz_update();
 		}
 	}
