@@ -493,9 +493,9 @@ function cdz_assets($path) {
 }
 
 
-function cdz_assets_render() { ?>
-<link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__); ?>assets/520.css">
-<script src="<?php echo plugin_dir_url(__FILE__); ?>assets/520.js"></script>
+function cdz_assets_render() { $clear = cdz_option('update_time'); ?>
+<link rel="stylesheet" href="<?php echo plugin_dir_url(__FILE__); ?>assets/520.css?<?php echo $clear; ?>">
+<script src="<?php echo plugin_dir_url(__FILE__); ?>assets/520.js?<?php echo $clear; ?>"></script>
 <?php }
 add_action('admin_footer', 'cdz_assets_render');
 add_action('wp_footer', 'cdz_assets_render');
