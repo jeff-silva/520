@@ -42,6 +42,12 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 			}
 		});
 
+		// <a href="" data-popup="#popup-01">Abrir Popup</a>
+		$("[data-popup]").off("click").on("click", function(ev) {
+			ev.preventDefault();
+			$( $(this).attr("data-popup")||false ).fadeToggle(200);
+		});
+
 		// Data mask
 		$_("data-mask", ["https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.13/jquery.mask.min.js"]);
 		
