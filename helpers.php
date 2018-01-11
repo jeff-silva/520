@@ -7,7 +7,7 @@ if (! function_exists('dd')) {
 		foreach(func_get_args() as $data) {
 			if (is_bool($data)) { $data = $data? 'true': 'false'; }
 			else $data = print_r($data, true);
-			echo '<pre style="font:11px monospace;">'. $data .'</pre>';
+			echo '<pre style="font:11px monospace; text-align:left;">'. $data .'</pre>';
 		}
 	}
 }

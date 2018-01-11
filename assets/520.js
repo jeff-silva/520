@@ -42,6 +42,34 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 			}
 		});
 
+		/* <div data-tabs="{}"></div> */
+		$("[data-tabs]").each(function() {
+			var $parent = $(this);
+			if ( $parent.hasClass("has-tabs") ) return false;
+			$parent.addClass("has-tabs");
+			var opts = $(this).attr("data-tabs")||"{}";
+			try { eval('opts='+opts); } catch(e) { opts={}; }
+			opts = $.extend({index:0}, opts);
+			var $tab = '<ul class="nav nav-tabs">';
+			$parent.find(">*").each(function(i) {
+				var tab_title = $(this).attr("title")||("Tab"+(i+1));
+				$tab += '<li><a href="javascriot:;">'+ tab_title +'</a></li>';
+				$(this).addClass("has-tabs-content").css({padding:15}).hide();
+			});
+			$tab += '</ul>';
+			$tab = $($tab);
+			$parent.prepend($tab);
+			$tab.find("a").on("click", function(ev) {
+				ev.preventDefault();
+				var index = $(this).parent().index();
+				$parent.find(">.has-tabs-content").hide();
+				$parent.find(">.has-tabs-content").eq(index).fadeIn(200);
+				$tab.find(">li").removeClass("active");
+				$tab.find(">li").eq(index).addClass("active");
+			});
+			$tab.find(">li").eq(opts.index).find(">a").click();
+		});
+
 		// <a href="" data-popup="#popup-01">Abrir Popup</a>
 		$("[data-popup]").off("click").on("click", function(ev) {
 			ev.preventDefault();
