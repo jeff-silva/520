@@ -110,6 +110,37 @@ function cdz_module_active($key) {
 
 
 
+function cdz_hosts() {
+	$return[] = array(
+		'name' => 'J. Siqueira',
+		'host' => 'http://jsiqueira.com',
+	);
+
+	$return[] = array(
+		'name' => 'Madame Jak',
+		'host' => 'http://madamejak.com',
+	);
+
+	$return[] = array(
+		'name' => 'Edmir Chedid',
+		'host' => 'http://edmirchedid.com.br/novo/',
+	);
+
+	$return[] = array(
+		'name' => 'Prime Carros',
+		'host' => 'http://projetos.jsiqueira.com/primecarros/',
+	);
+
+	$return[] = array(
+		'name' => 'Comunidades Educadoras',
+		'host' => 'http://comunidadeseducadoras.com.br',
+	);
+
+	return $return;
+}
+
+
+
 /* Update */
 function cdz_update() {
 
