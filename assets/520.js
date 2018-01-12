@@ -26,21 +26,42 @@ function $_(attr, files, call) {
 	}
 }
 
-var cdzInit=function() {};
 
+
+
+
+var cdzInit = function() {};
 $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js", function() {
+	
 	var cdzInit = function() {
+
+		// Body click events
+		var _bodyOnClick = function(ev) {
+			var $this = $(ev.target);
+
+			// jquery popup close
+			if ( $(ev.target).hasClass("popup") ) {
+				$this.fadeOut(200);
+			}
+
+			// close popup parent
+			else if ( $(ev.target).hasClass("popup-close") ) {
+				ev.preventDefault();
+				$this.closest(".popup").fadeOut(200);
+			}
+
+			// <a href="" data-popup="#popup-01">Abrir Popup</a>
+			else if ( $this.attr("data-popup")||false ) {
+				ev.preventDefault();
+				$( $this.attr("data-popup") ).fadeToggle(200);
+			}
+		};
+		$(document).off("click", _bodyOnClick).on("click", _bodyOnClick);
+
 
 		// Remove autocomplete from forms
 		$("form").attr("autocomplete", "off");
 
-		// jquery popup close
-		$(".popup").off("click").on("click", function(ev) {
-			var $popup = $(this);
-			if ( $(ev.target).hasClass("popup") || $(ev.target).hasClass("popup-close") ) {
-				$popup.fadeOut(200);
-			}
-		});
 
 		/* <div data-tabs="{}"></div> */
 		$("[data-tabs]").each(function() {
@@ -70,14 +91,17 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 			$tab.find(">li").eq(opts.index).find(">a").click();
 		});
 
-		// <a href="" data-popup="#popup-01">Abrir Popup</a>
-		$("[data-popup]").off("click").on("click", function(ev) {
-			ev.preventDefault();
-			$( $(this).attr("data-popup")||false ).fadeToggle(200);
-		});
-
 		// Data mask
-		$_("data-mask", ["https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.13/jquery.mask.min.js"]);
+		$.jMaskGlobals = {};
+		$.jMaskGlobals.dataMaskAttr = "*[data-masked]";
+		$.jMaskGlobals.dataMask = false;
+		$.jMaskGlobals.watchDataMask = false;
+		$_("data-mask", ["https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.13/jquery.mask.min.js"], function(opts) {
+			opts.mask = opts.mask||"";
+			if (opts.mask=="money") { opts.mask="000.000.000.000.000,00"; opts.reverse=true; }
+			// else if (opts.mask=="phone") {}
+			$(this).mask(opts.mask, opts);
+		});
 		
 		// Data table
 		$_("data-table", [

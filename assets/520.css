@@ -8,6 +8,15 @@
 /* Cover */
 .cover {width:200px; height:200px; display:block; background: url() no-repeat center center; background-size:cover;}
 
+/* Pure CSS tabs */
+.tabs {position:relative;}
+.tabs > label {display:inline-block; padding:5px 15px; margin-right:-5px; font-weight:normal; border-bottom:solid 3px transparent;}
+.tabs > label:hover {border-bottom-color:#eee}
+.tabs > div {display:none; padding:15px; margin-top:-7px; float:right; width:100%;}
+.tabs > input {position:absolute; left:-999px; right:-999px;}
+.tabs > input:checked + label {border-bottom-color:#7c9fde;}
+.tabs > input:checked + label + div {display:block;}
+
 /* Loading spinners | https://stephanwagner.me/only-css-loading-spinner */
 @keyframes _spinner { to {transform: rotate(360deg);} }
 .loading-01:before {content:''; display:inline-block; width:20px; height:20px; margin:0px 5px -6px 5px; border-radius:50%; border:2px solid #ccc; border-top-color: #333; animation: _spinner .6s linear infinite;}
