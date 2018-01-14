@@ -35,28 +35,18 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 	
 	var cdzInit = function() {
 
-		// Body click events
-		var _bodyOnClick = function(ev) {
+		// [data-popup]
+		$(document).on("click", "[data-popup]", function() {
+			var popup = $(this).attr("data-popup")||false;
+			$(popup).fadeToggle(200);
+		});
+
+		// .popup || .popup-close
+		$(document).on("click", ".popup", function(ev) {
 			var $this = $(ev.target);
-
-			// jquery popup close
-			if ( $(ev.target).hasClass("popup") ) {
-				$this.fadeOut(200);
-			}
-
-			// close popup parent
-			else if ( $(ev.target).hasClass("popup-close") ) {
-				ev.preventDefault();
-				$this.closest(".popup").fadeOut(200);
-			}
-
-			// <a href="" data-popup="#popup-01">Abrir Popup</a>
-			else if ( $this.attr("data-popup")||false ) {
-				ev.preventDefault();
-				$( $this.attr("data-popup") ).fadeToggle(200);
-			}
-		};
-		$(document).off("click", _bodyOnClick).on("click", _bodyOnClick);
+			if ($this.hasClass("popup")) $this.fadeOut(200);
+			else if ($this.hasClass("popup-close")) $this.closest(".popup").fadeOut(200);
+		});
 
 
 		// Remove autocomplete from forms
