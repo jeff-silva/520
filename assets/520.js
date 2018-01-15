@@ -18,7 +18,7 @@ function $_(attr, files, call) {
 	if ($els.length) {
 		head.load(files, function() {
 			$els.each(function() {
-				var opts = $(this).attr("data-table")||"{}";
+				var opts = $(this).attr(attr)||"{}";
 				try { eval('opts='+opts); } catch(e) { opts={}; }
 				call.call(this, opts);
 			});
