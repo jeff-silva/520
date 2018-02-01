@@ -113,6 +113,8 @@ function cdz_module_active($key) {
 
 /* Update */
 function cdz_update() {
+	
+	if (! ini_get('allow_url_fopen')) { return false; }
 
 	// Download zip
 	include __DIR__ . '/libs/PclZip.php';
