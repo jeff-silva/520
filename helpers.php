@@ -372,7 +372,8 @@ function cdz_flash($class=null, $text=null) {
 
 
 function cdz_flash_render() {
-	if (! empty($classes = cdz_flash())) { ?>
+	$classes = cdz_flash();
+	if (! empty($classes)) { ?>
 	<div class="cdz-flash" style="position:fixed; top:40px; left:20%; width:60%; z-index:99999999 !important;">
 		<?php foreach($classes as $class=>$flashes): ?>
 		<div class="alert alert-<?php echo $class; ?>">
