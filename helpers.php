@@ -318,11 +318,12 @@ function helper_content($url, $post=null) {
 		return ob_get_clean();
 	}
 
-	$return = file_get_contents($url, false, stream_context_create(array(
-		'http' => array('ignore_errors' => true),
-	)));
-
-	if (! $return) {
+	if (ini_get('allow_url_fopen')) {
+		$return = file_get_contents($url, false, stream_context_create(array(
+			'http' => array('ignore_errors' => true),
+		)));
+	}
+	else {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
