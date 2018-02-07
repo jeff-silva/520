@@ -152,6 +152,111 @@ class Ui
 
 
 
+	static function uploads($attrs=null, $value=null)
+	{
+		$id = 'ui-uploads-' . uniqid(rand());
+		$value = $value? $value: '[]';
+		$attrs = self::_attrs($attrs, array(
+			'name' => '',
+			'style' => 'display:none;',
+		));
+
+		?>
+		
+		<div id="<?php echo $id; ?>" class="ui-uploads">
+			<textarea <?php echo $attrs; ?>>{{ value }}</textarea>
+			<button type="button" class="btn btn-default ui-uploads-btn" @click="_modal();">
+				<i class="fa fa-fw fa-upload"></i> Upload
+			</button>
+			<br><br>
+			<div class="ui-uploads-sortable">
+				<div v-for="(img,i) in value" style="display:inline-block; margin:0px 5px 5px 0px; overflow:hidden;">
+					<div class="ui-uploads-sortable-handle" style="position:relative;">
+						<img :src="img.sizes.thumbnail.url" alt="">
+						<div style="position:absolute; top:0; left:0; width:100%; text-align:right; background:rgba(255,255,255,.8); padding:5px;">
+							<a href="javascript:;" class="fa fa-fw fa-pencil" @click="_edit(img, i);"></a>
+							<a href="javascript:;" class="fa fa-fw fa-remove" @click="_remove(img);"></a>
+						</div>
+					</div>
+					<div class="popup" :class="'popup-ui-uploads-edit-'+i">
+						<div class="panel panel-default" style="min-width:400px;">
+							<div class="panel-heading">{{ img.title || '-' }}</div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label>Título</label>
+									<input type="text" v-model="img.title" class="form-control" title="Título da imagem">
+								</div>
+
+								<div class="form-group">
+									<label>Caption</label>
+									<input type="text" v-model="img.caption" class="form-control" title="Descrição curta">
+								</div>
+
+								<div class="form-group">
+									<label>Descrição</label>
+									<textarea class="form-control" title="Descrição longa" v-model="img.description"></textarea>
+								</div>
+							</div>
+							<div class="panel-footer text-right">
+								<button type="button" class="btn btn-default" data-close-popup>Salvar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- <pre>{{ $data }}</pre> -->
+		</div>
+
+		<?php wp_enqueue_media(); ?>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+		<script type="text/javascript">
+		new Vue({
+			el: "#<?php echo $id; ?>",
+			data: {
+				value: <?php echo $value; ?>,
+			},
+			methods: {
+				_modal: function() {
+					var app = this;
+					var image = wp.media({title:'Upload', multiple: true}).open().on('select', function(e) {
+						var selection = JSON.parse(JSON.stringify(image.state().get('selection'), " ", 2));
+						for(var i in selection) { app.value.push(selection[i]); }
+					});
+				},
+				_remove: function(img) {
+					var app = this;
+					var index = app.value.indexOf(img);
+					app.value.splice(index, 1);
+				},
+				_edit: function(img, i) {
+					var app=this, $=jQuery;
+					$("#<?php echo $id; ?> .popup-ui-uploads-edit-"+i).fadeIn(200);
+				},
+			},
+			mounted: function(){
+				var app=this, $=jQuery;
+				app.$nextTick(function() {
+					var list = $(app.$el).find(".ui-uploads-sortable").get(0);
+					var sortable = Sortable.create(list, {
+						animation: 150,
+						handle: ".ui-uploads-sortable-handle",
+						onEnd: function(e) {
+							var array = app.value.filter(function(item) { return item; });
+							array.splice(e.newIndex, 0, array.splice(e.oldIndex, 1)[0]);
+							app.value = [];
+							app.$nextTick(function() { app.value = array; });
+						}
+					});
+				});
+			},
+		});
+		</script>
+		<?php
+	}
+
+
+
 	static function posts($name, $value=null)
 	{
 		
