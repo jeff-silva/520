@@ -46,13 +46,28 @@
 
 global $cdz_modules;
 
+
+if (! function_exists('dd')) {
+	function dd() {
+		foreach(func_get_args() as $data) {
+			if (is_bool($data)) { $data = $data? 'true': 'false'; }
+			else $data = print_r($data, true);
+			echo '<pre style="font:11px monospace; text-align:left;">'. $data .'</pre>';
+		}
+	}
+}
+
+
 spl_autoload_register(function($class) {
-	$class = preg_replace('/[^a-zA-Z0-9]/', DIRECTORY_SEPARATOR, $class);
-	if ($class = realpath(__DIR__ . DIRECTORY_SEPARATOR . $class . '.php')) {
-		include $class;
+	$exp = explode('\\', $class);
+	if ($exp[0]=='Cdz') {
+		$exp[0] = __DIR__;
+		$class = implode(DIRECTORY_SEPARATOR, $exp) .'.php';
+		if ($class = realpath($class)) {
+			include $class;
+		}
 	}
 });
-
 
 define('__520DIR__', __DIR__);
 
@@ -60,6 +75,35 @@ define('__520DIR__', __DIR__);
 include __DIR__ . '/libs/Db.php';
 include __DIR__ . '/helpers.php';
 include __DIR__ . '/helpers-ui.php';
+
+
+if (isset($_REQUEST['cdz'])) {
+	$params = explode('.', $_REQUEST['cdz']);
+	if (strtolower($params[0]) != 'cdz') array_unshift($params, 'Cdz');
+	
+	$class[] = array_shift($params);
+	$class[] = array_shift($params);
+	$class[] = array_shift($params);
+	$class = implode('\\', $class);
+	$class = new $class();
+	$method = 'api' . ucfirst(array_shift($params));
+	$call = array($class, $method);
+
+	$json = array('success'=>false, 'error'=>false);
+	if (is_callable($call)) {
+		try {
+			$json['success'] = call_user_func_array($call, $params);
+		}
+		catch(\Exception $e) {
+			$json['error'] = $e->getMessage();
+		}
+	}
+	else {
+		$json['error'] = 'Método inexistente';
+	}
+
+	echo json_encode($json); die;
+}
 
 
 function cdz_option($key=null, $default=null) {

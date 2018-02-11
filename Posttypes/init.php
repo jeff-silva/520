@@ -2,7 +2,7 @@
 
 
 add_action('init', function() {
-	$posttypes = new Posttypes\Posttypes();
+	$posttypes = new \Cdz\Posttypes\Posttypes();
 	$posttypes->register();
 });
 

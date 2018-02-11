@@ -21,6 +21,24 @@
 						<option value="1" <?php echo $editor_fontsize==1? 'selected': null; ?>>Ativo</option>
 					</select>
 				</div>
+
+				<div class="form-group">
+					<label>Salvar com CTRL+S</label>
+					<?php $editor_ctrl_s = cdz_option('editor_ctrl_s', '0'); ?>
+					<select name="editor_ctrl_s" class="form-control">
+						<option value="0" <?php echo $editor_ctrl_s==0? 'selected': null; ?>>Inativo</option>
+						<option value="1" <?php echo $editor_ctrl_s==1? 'selected': null; ?>>Ativo</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label>Pesquisa rápida</label>
+					<?php $editor_fast_search = cdz_option('editor_fast_search', '0'); ?>
+					<select name="editor_fast_search" class="form-control">
+						<option value="0" <?php echo $editor_fast_search==0? 'selected': null; ?>>Inativo</option>
+						<option value="1" <?php echo $editor_fast_search==1? 'selected': null; ?>>Ativo</option>
+					</select>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -2,16 +2,6 @@
 
 if(! session_id()) session_start();
 
-if (! function_exists('dd')) {
-	function dd() {
-		foreach(func_get_args() as $data) {
-			if (is_bool($data)) { $data = $data? 'true': 'false'; }
-			else $data = print_r($data, true);
-			echo '<pre style="font:11px monospace; text-align:left;">'. $data .'</pre>';
-		}
-	}
-}
-
 
 function helper_show_hooks() {
 	$debug_tags = array();
