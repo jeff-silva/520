@@ -17,7 +17,10 @@
 							<div class="pull-right">
 								<a href="javascript:;" class="fa fa-remove text-danger" @click="_posttypeDelete(item);"></a>
 							</div>
-							<a href="javascript:;" @click="posttype=item" data-popup=".popup-posttype">{{ item.posttype_plural }}</a>
+							<a href="javascript:;" @click="posttype=item" data-popup=".popup-posttype">
+								<i :class="item.posttype_data.menu_icon"></i>
+								{{ item.posttype_plural }}
+							</a>
 						</li>
 					</ul>
 
@@ -40,7 +43,20 @@
 											<div class="row">
 												<div class="col-xs-12 form-group">
 													<label>Slug</label>
-													<input type="text" v-model="posttype.posttype_slug" class="form-control">
+													<div class="input-group">
+														<input type="text" v-model="posttype.posttype_slug" class="form-control">
+														<div class="input-group-addon" style="cursor:pointer;" onclick="jQuery('.icon-selector').fadeToggle(200);" :title="posttype.posttype_data.menu_icon">
+															<i :class="posttype.posttype_data.menu_icon"></i>
+														</div>
+													</div>
+													<div class="icon-selector" style="display:none;">
+														<div style="padding:5px; background:#eee;">
+															<input type="text" class="form-control" placeholder="Filtrar ícones" @keyup="_iconsFilter($event);">
+														</div>
+														<div style="max-height:300px; overflow:auto;">
+															<i style="margin:3px;" :class="icon" :title="icon" :data-icon="icon" :style="icon==posttype.posttype_data.menu_icon? 'background:#ffd;': ''" v-for="icon in icons" @click="posttype.posttype_data.menu_icon=icon" onclick="jQuery('.icon-selector').fadeOut(200);"></i>
+														</div>
+													</div>
 												</div>
 
 												<div class="col-xs-6 form-group">
@@ -152,7 +168,7 @@ var app = new Vue({
 	el: "#app",
 	data: {
 		loading: false,
-		ajax: "<?php echo site_url('/admin-ajax.php'); ?>",
+		ajax: "<?php echo site_url('/wp-admin/admin-ajax.php'); ?>",
 		posttype: {
 			posttype_id: null,
 			posttype_slug: null,
@@ -169,6 +185,7 @@ var app = new Vue({
 			taxonomy_data: [],
 		},
 		taxonomies: [],
+		icons: <?php echo json_encode(cdz_icons()); ?>,
 	},
 	methods: {
 		_ajax: function(method, params, call) {
@@ -227,6 +244,24 @@ var app = new Vue({
 				"cdz": "Posttypes.Posttypes.taxonomyDelete",
 				"id": taxonomy.taxonomy_id,
 			});
+		},
+		
+		_iconsFilter: function($ev) {
+			var app=this, $=jQuery;
+			var $icons = $(app.$el).find(".icon-selector i");
+			var search = ($ev.target.value||"").toLowerCase();
+			
+			if (search) {
+				$icons.hide();
+				$icons.each(function() {
+					var value = ($(this).attr("data-icon")||"").toLowerCase();
+					if (value.indexOf(search)!==-1) $(this).show();
+				});
+			}
+			
+			else {
+				$icons.show();
+			}
 		},
 	},
 	mounted: function() {

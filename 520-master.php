@@ -77,32 +77,36 @@ include __DIR__ . '/helpers.php';
 include __DIR__ . '/helpers-ui.php';
 
 
+
 if (isset($_REQUEST['cdz'])) {
-	$params = explode('.', $_REQUEST['cdz']);
-	if (strtolower($params[0]) != 'cdz') array_unshift($params, 'Cdz');
+	add_action('init', function() {
+		$params = explode('.', $_REQUEST['cdz']);
+		if (strtolower($params[0]) != 'cdz') array_unshift($params, 'Cdz');
+		
+		$class[] = array_shift($params);
+		$class[] = array_shift($params);
+		$class[] = array_shift($params);
+		$class = implode('\\', $class);
+		$class = new $class();
+		$method = 'api' . ucfirst(array_shift($params));
+		$call = array($class, $method);
 	
-	$class[] = array_shift($params);
-	$class[] = array_shift($params);
-	$class[] = array_shift($params);
-	$class = implode('\\', $class);
-	$class = new $class();
-	$method = 'api' . ucfirst(array_shift($params));
-	$call = array($class, $method);
-
-	$json = array('success'=>false, 'error'=>false);
-	if (is_callable($call)) {
-		try {
-			$json['success'] = call_user_func_array($call, $params);
+		$json = array('success'=>false, 'error'=>false);
+		if (is_callable($call)) {
+			// dd($class, $method, $call, $json); die;
+			try {
+				$json['success'] = call_user_func_array($call, $params);
+			}
+			catch(\Exception $e) {
+				$json['error'] = $e->getMessage();
+			}
 		}
-		catch(\Exception $e) {
-			$json['error'] = $e->getMessage();
+		else {
+			$json['error'] = 'Método inexistente';
 		}
-	}
-	else {
-		$json['error'] = 'Método inexistente';
-	}
-
-	echo json_encode($json); die;
+	
+		echo json_encode($json); die;
+	});
 }
 
 
