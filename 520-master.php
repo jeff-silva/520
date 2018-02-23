@@ -93,7 +93,6 @@ if (isset($_REQUEST['cdz'])) {
 	
 		$json = array('success'=>false, 'error'=>false);
 		if (is_callable($call)) {
-			// dd($class, $method, $call, $json); die;
 			try {
 				$json['success'] = call_user_func_array($call, $params);
 			}
@@ -105,6 +104,7 @@ if (isset($_REQUEST['cdz'])) {
 			$json['error'] = 'Método inexistente';
 		}
 	
+		$json['request'] = $_REQUEST;
 		echo json_encode($json); die;
 	});
 }

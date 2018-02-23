@@ -1,3 +1,5 @@
+<?php cdz_header(); ?>
+
 <br>
 <div id="app">
 	<div class="row">
@@ -9,7 +11,7 @@
 			<strong>Faltam:</strong> R${{ project_budget_miss | currency }}
 			<br>
 
-			<?php $statuses = (new Projects\Projects())->statuses();
+			<?php $statuses = (new \Cdz\Projects\Projects())->statuses();
 			foreach($statuses as $status): ?>
 			<label>
 				<input type="checkbox" class="form-control" v-model="search.statuses" value="<?php echo $status['id']; ?>" @change="_projectsList();">
@@ -101,10 +103,9 @@
 			<div v-if="(i+1)%3==0" class="col-lg-12 visible-lg"></div>
 		</div>
 	</div>
-	<pre>{{ $data }}</pre>
+	<!-- <pre>{{ $data }}</pre> -->
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.4/vue.min.js"></script>
 <script>
 var app = new Vue({
 	el: "#app",
@@ -117,13 +118,13 @@ var app = new Vue({
 		project_budget_paid: 0,
 		project_budget_miss: 0,
 		projects: [],
-		statuses: <?php echo json_encode( (new Projects\Projects())->statuses() ); ?>,
+		statuses: <?php echo json_encode( (new \Cdz\Projects\Projects())->statuses() ); ?>,
 	},
 	methods: {
 		_projectsList: function() {
 			var app=this, $=jQuery;
 			app.loading = true;
-			$.post("admin-ajax.php?action=520&call=Projects.Projects.listing", app.search, function(response) {
+			$.post("<?php echo site_url('/wp-admin/admin-ajax.php?cdz=Cdz.Projects.Projects.listing'); ?>", app.search, function(response) {
 				app.loading = false;
 				app.projects = response.success.posts;
 				app.project_budget = response.success.project_budget;
@@ -138,18 +139,5 @@ var app = new Vue({
 		app._projectsList();
 		setInterval(app._projectsList, 60000);
 	},
-});
-</script>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="<?php echo plugins_url('520'); ?>/assets/bs3-ui.css">
-
-<script>
-jQuery(document).ready(function($) {
-	$("body").on("click", ".target-blank a", function() {
-		$(this).attr("target", "_blank");
-	});
 });
 </script>

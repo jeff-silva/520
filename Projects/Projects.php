@@ -1,4 +1,4 @@
-<?php namespace Projects;
+<?php namespace Cdz\Projects;
 
 class Projects extends \Db
 {

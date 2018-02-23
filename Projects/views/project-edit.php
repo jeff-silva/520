@@ -1,4 +1,124 @@
 <?php
+// update_post_meta($post->ID, 'meta_logins', '');
+cdz_header();
+wp_enqueue_media();
+$post = new \Cdz\Projects\Project($post);
+$post->tasks();
+$post->logins();
+
+?>
+
+<br>
+<div id="app-520-project2">
+	<div class="panel panel-default">
+		<div class="panel-heading">Logins</div>
+		<div class="panel-body">
+			<div class="text-right">
+				<a href="javascript:;" class="btn btn-xs btn-default" @click="_loginAdd();"><i class="fa fa-fw fa-plus"></i></a>
+			</div><br>
+
+			<ul class="list-group">
+				<li class="list-group-item" v-for="(login, i) in post.meta_logins">
+					<div class="pull-right">
+						<a href="javascript:;" class="fa fa-fw fa-pencil" :data-popup="'.popup-edit-'+i"></a>
+						<a href="javascript:;" class="fa fa-fw fa-remove" @click="_loginRemove(login);"></a>
+					</div>
+
+					<a :href="login.url" target="_blank">{{ login.type }} {{ login.name }}</a>
+
+					<div :class="'popup popup-edit-'+i">
+						<div class="panel panel-default" style="width:400px;">
+							<div class="panel-heading">Editar</div>
+							<div class="panel-body">
+								<input type="text" v-model="login.name" placeholder="login.name" class="form-control">
+								<input type="text" v-model="login.host" placeholder="login.host" class="form-control">
+								<input type="text" v-model="login.user" placeholder="login.user" class="form-control">
+								<input type="text" v-model="login.pass" placeholder="login.pass" class="form-control">
+								<input type="text" v-model="login.port" placeholder="login.port" class="form-control">
+								<select v-model="login.type" class="form-control">
+									<option value="">Selecione</option>
+									<option :value="lt.id" v-for="lt in loginTypes">{{ lt.name }}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+	<!-- <pre>{{ $data }}</pre> -->
+</div>
+<script>
+var app = new Vue({
+	el: "#app-520-project2",
+	data: {
+		loading: null,
+		ajax: "<?php echo site_url('/wp-admin/admin-ajax.php'); ?>",
+		post: <?php echo json_encode($post); ?>,
+		loginTypes: <?php echo json_encode($post->loginTypes()); ?>
+	},
+	methods: {
+		_ajax: function(cdz, params, callback, method) {
+			var app=this, $=jQuery;
+			params.cdz = cdz;
+			method = method||"get";
+			callback = typeof callback=="function"? callback: function() {};
+
+			app.loading = true;
+			$.ajax({
+				url: app.ajax,
+				data: params,
+				dataType: "json",
+				method: method,
+				success: function(response) {
+					console.log(response);
+					app.loading = false;
+					if (response.success) {
+						for(var i in response.success) {
+							console.log(i, response.success[i]);
+							Vue.set(app, i, response.success[i]);
+						}
+					}
+					callback.call(app, response);
+				},
+			});
+		},
+		_save: function(callback) {
+			var app=this, $=jQuery;
+			app._ajax("Cdz.Projects.Project.save", {post:app.post}, callback, "post");
+		},
+		_loginAdd: function() {
+			var app=this, $=jQuery;
+			app.post.meta_logins.push({id:"", name:"", host:"", user:"", pass:"", port:"", type:""});
+		},
+		_loginRemove: function(login) {
+			if (!confirm("Deseja deletar este login?")) return false;
+			var app=this, $=jQuery;
+			var index = app.post.meta_logins.indexOf(login);
+			app.post.meta_logins.splice(index, 1);
+		},
+	},
+	mounted: function() {
+		var app=this, $=jQuery;
+		$(document).on("click", "#publish", function(ev) {
+			var clicksave = $(this).attr("data-clicksave")||false;
+			if (! clicksave) {
+				ev.preventDefault();
+				$(this).attr("data-clicksave", "1");
+				app._save(function() {
+					$("#publish").click();
+				});
+			}
+		});
+	},
+});
+</script>
+
+
+
+<?php /* ?>
+<?php
 $project_budget = get_post_meta($post->ID, 'project_budget', true);
 $project_budget_paid = get_post_meta($post->ID, 'project_budget_paid', true);
 $project_start = get_post_meta($post->ID, 'project_start', true);
@@ -165,16 +285,6 @@ $project_uploads = $project_uploads? $project_uploads: '[]';
 </div>
 
 
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/3.0.7/flatpickr.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/3.0.7/flatpickr.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<?php wp_enqueue_media(); ?>
-
 <script>
 var App520Project = new Vue({
 	el: "#app_250_project",
@@ -266,3 +376,4 @@ var App520Project = new Vue({
 <style>
 select.form-control {height:auto!important; padding:10px 8px;}
 </style>
+<?php */ ?>
