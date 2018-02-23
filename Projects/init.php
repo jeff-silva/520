@@ -243,3 +243,30 @@ add_filter('manage_edit-520-projects_columns', function($columns) {
 // 	}
 // }, 10, 2 );
 
+
+add_action('template_redirect', function() {
+	global $post;
+	$post = new \Cdz\Projects\Project($post);
+	?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<?php cdz_header(); ?>
+</head>
+<body>
+	<br>
+	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-heading"><?php echo $post->post_title; ?></div>
+			<div class="panel-body">
+				<?php echo $post->post_content; ?>
+			</div>
+		</div>
+		<?php // dd($post); ?>
+	</div>
+	<br>
+</body>
+</html>
+<?php die; });
