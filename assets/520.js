@@ -107,6 +107,20 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 			$(this).DataTable(opts);
 		});
 
+
+		// data-flatpickr
+		$_("data-flatpickr", [
+			"https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.3.2/flatpickr.min.js",
+			"https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.3.2/flatpickr.min.css",
+		], function(opts) {
+			opts = $.extend({
+				time_24hr: true,
+				enableTime: true,
+				dateFormat: "Y-m-d H:i:S",
+			}, opts);
+			$(this).flatpickr(opts);
+		});
+
 	};
 	cdzInit.call();
 });
