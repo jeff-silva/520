@@ -151,7 +151,14 @@ function module_project_logins($login) {
 // 	));
 // }, 0);
 
-
+add_action('save_post', function() {
+	if (isset($_REQUEST['520-project-data'])) {
+		$save = stripslashes($_REQUEST['520-project-data']);
+		$save = json_decode($save, true);
+		$save = new \Cdz\Projects\Project($save);
+		$save->save($save);
+	}
+});
 
 add_action('edit_form_after_editor', function($post) {
 	global $post;
@@ -171,38 +178,31 @@ add_action('manage_520-projects_posts_custom_column', function ($column_name, $p
     
     if ($column_name == '520-project-info') {
 
-    	$fields[] = array('percent'=>rand(10, 100), 'title'=>'Deadline', 'class'=>'progress-bar-default');
-    	$fields[] = array('percent'=>rand(10, 100), 'title'=>'Tasks', 'class'=>'progress-bar-default');
-    	$fields[] = array('percent'=>rand(10, 100), 'title'=>'Pagamento', 'class'=>'progress-bar-default');
-
-    	$fields[] = array(
-    		'class' => false,
-    		'title' => 'Progresso total',
-    		'percent' => (array_sum(array_column($fields, 'percent')) / sizeof($fields)),
-    	);
-
-    	$last = array_pop($fields);
-    	array_unshift($fields, $last);
-
-    	foreach($fields as $i=>$field) {
-    		if (! $field['class']) {
-    			if ($field['percent']>=0 && $field['percent']<=50) $field['class']='progress-bar-success';
-    			else $field['class']='progress-bar-danger';
-    		}
-
-    		$field['percent'] = round($field['percent'], 2);
-    		$fields[$i] = $field;
-    	}
+    	$infos = new \Cdz\Projects\Project($post_id);
+    	$infos = $infos->infos();
 
     	?>
 		<div style="">
-	    	<?php foreach($fields as $field) { ?>
-			<div class="progress" title="<?php echo $field['title']; ?>: <?php echo round($field['percent'], 2); ?>%" style="margin:0px 0px 3px 0px;">
-				<div class="progress-bar <?php echo $field['class']; ?> progress-bar-striped active" style="text-align:left; overflow:initial; white-space:nowrap; color:#333 !important; width:<?php echo $field['percent']; ?>%">
-					&nbsp; <?php echo $field['title']; ?>: <?php echo $field['percent']; ?>%
+			<?php foreach($infos as $info): ?>
+			<div>
+				
+				<?php if ($info['type']=='$'): ?>
+				<div class="progress" title="<?php echo $info['name']; ?>" style="margin:0px 0px 3px 0px;">
+					<div class="progress-bar progress-bar-striped active" style="text-align:left; overflow:initial; white-space:nowrap; color:#333 !important; width:0%;">
+						&nbsp; <?php echo $info['name']; ?>: R$<?php echo number_format(intval($info['value']), 2, ',', '.'); ?>
+					</div>
 				</div>
+				<?php endif; ?>
+
+				<?php if ($info['type']=='%'): ?>
+				<div class="progress" title="<?php echo $info['name']; ?>: <?php echo round($info['value'], 2); ?>%" style="margin:0px 0px 3px 0px;">
+					<div class="progress-bar progress-bar-striped active" style="text-align:left; overflow:initial; white-space:nowrap; color:#333 !important; width:<?php echo $info['value']; ?>%">
+						&nbsp; <?php echo $info['name']; ?>: <?php echo $info['value']; ?>%
+					</div>
+				</div>
+				<?php endif; ?>
 			</div>
-	    	<?php } ?>
+			<?php endforeach; ?>
 		</div>
     	<?php
 	}

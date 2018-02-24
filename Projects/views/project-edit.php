@@ -10,6 +10,22 @@ $post->logins();
 
 <br>
 <div id="app-520-project2">
+	<div class="panel panel-default" v-if="infos">
+		<div class="panel-body">
+			<div v-for="info in infos">
+				<strong>{{ info.name }}</strong>
+
+				<span v-if="info.type=='$'">{{ info.value }}</span>
+
+				<div class="progress" style="margin:0;" v-if="info.type=='%'">
+					<div class="progress-bar progress-bar-striped active" :style="{width:info.value+'%'}">
+						{{ info.value }}% Complete
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="panel panel-default">
 		<div class="panel-heading">Logins</div>
 		<div class="panel-body">
@@ -24,21 +40,103 @@ $post->logins();
 						<a href="javascript:;" class="fa fa-fw fa-remove" @click="_loginRemove(login);"></a>
 					</div>
 
-					<a :href="login.url" target="_blank">{{ login.type }} {{ login.name }}</a>
+					<a :href="login.url" target="_blank">
+						{{ login.name }} <br>
+						<small>{{ login.url }}</small>
+					</a>
 
 					<div :class="'popup popup-edit-'+i">
 						<div class="panel panel-default" style="width:400px;">
 							<div class="panel-heading">Editar</div>
 							<div class="panel-body">
-								<input type="text" v-model="login.name" placeholder="login.name" class="form-control">
-								<input type="text" v-model="login.host" placeholder="login.host" class="form-control">
-								<input type="text" v-model="login.user" placeholder="login.user" class="form-control">
-								<input type="text" v-model="login.pass" placeholder="login.pass" class="form-control">
-								<input type="text" v-model="login.port" placeholder="login.port" class="form-control">
-								<select v-model="login.type" class="form-control">
-									<option value="">Selecione</option>
-									<option :value="lt.id" v-for="lt in loginTypes">{{ lt.name }}</option>
-								</select>
+								<div class="row">
+									<div class="col-xs-12 form-group">
+										<label>Name</label>
+										<input type="text" v-model="login.name" placeholder="login.name" class="form-control">
+									</div>
+									<div class="col-xs-12 form-group">
+										<label>Host</label>
+										<input type="text" v-model="login.host" placeholder="login.host" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>User</label>
+										<input type="text" v-model="login.user" placeholder="login.user" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Pass</label>
+										<input type="text" v-model="login.pass" placeholder="login.pass" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Port</label>
+										<input type="text" v-model="login.port" placeholder="login.port" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Type</label>
+										<select v-model="login.type" class="form-control">
+											<option value="">Selecione</option>
+											<option :value="lt.id" v-for="lt in loginTypes">{{ lt.name }}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+
+	<div class="panel panel-default">
+		<div class="panel-heading">Tasks</div>
+		<div class="panel-body">
+			<ul class="list-grou">
+				<li class="list-group-item" style="padding:0;">
+					<a href="javascript:;" class="btn btn-lg btn-block btn-primary" style="margin:0;" @click="_taskAdd();">Add task</a>
+				</li>
+				<li class="list-group-item text-center text-muted" v-if="post.meta_tasks.length==0">
+					Nenhuma task criada
+				</li>
+				<li class="list-group-item" v-for="(task, i) in post.meta_tasks">
+					<div class="pull-right">
+						<a href="javascript:;" class="fa fa-fw fa-pencil" :data-popup="'.popup-edit-task-'+i"></a>
+					</div>
+					<input type="checkbox" v-model="task.closed" true-value="1" false-value="0">
+					<strong>{{ task.title }}</strong><br>
+					<small v-if="task.date_start || task.date_final">
+						{{ task.date_start }} - {{ task.date_final }}
+					</small>
+
+					<div :class="'popup popup-edit-task-'+i">
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-xs-6 form-group">
+										<label>Title</label>
+										<input type="text" v-model="task.title" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Status</label>
+										<input type="text" v-model="task.status" class="form-control">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Date start</label>
+										<input type="text" v-model="task.date_start" class="form-control" data-flatpickr="{}">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Date final</label>
+										<input type="text" v-model="task.date_final" class="form-control" data-flatpickr="{}">
+									</div>
+									<div class="col-xs-6 form-group">
+										<label>Budget</label>
+										<input type="text" v-model="task.budget" class="form-control">
+									</div>
+									<div class="clearfix"></div>
+									<div class="col-xs-12 form-group">
+										<label>Description</label>
+										<textarea class="form-control" v-model="task.description"></textarea>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -48,6 +146,7 @@ $post->logins();
 	</div>
 	
 	<!-- <pre>{{ $data }}</pre> -->
+	<textarea name="520-project-data" style="display:none;">{{ post }}</textarea>
 </div>
 <script>
 var app = new Vue({
@@ -56,7 +155,8 @@ var app = new Vue({
 		loading: null,
 		ajax: "<?php echo site_url('/wp-admin/admin-ajax.php'); ?>",
 		post: <?php echo json_encode($post); ?>,
-		loginTypes: <?php echo json_encode($post->loginTypes()); ?>
+		loginTypes: <?php echo json_encode($post->loginTypes()); ?>,
+		infos: null,
 	},
 	methods: {
 		_ajax: function(cdz, params, callback, method) {
@@ -98,19 +198,18 @@ var app = new Vue({
 			var index = app.post.meta_logins.indexOf(login);
 			app.post.meta_logins.splice(index, 1);
 		},
+		_taskAdd: function() {
+			var app=this, $=jQuery;
+			app.post.meta_tasks.push({id:"", title:"", description:"", status:"", date_start:"", date_final:"", closed:"0"});
+		},
+		_infos: function() {
+			var app=this, $=jQuery;
+			app._ajax("Cdz.Projects.Project.infos", {post:app.post.ID});
+		},
 	},
 	mounted: function() {
 		var app=this, $=jQuery;
-		$(document).on("click", "#publish", function(ev) {
-			var clicksave = $(this).attr("data-clicksave")||false;
-			if (! clicksave) {
-				ev.preventDefault();
-				$(this).attr("data-clicksave", "1");
-				app._save(function() {
-					$("#publish").click();
-				});
-			}
-		});
+		app._infos();
 	},
 });
 </script>
