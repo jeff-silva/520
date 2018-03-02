@@ -221,6 +221,59 @@ function cdz_need_update() {
 
 
 
+function cdz_dependencies() {
+	$dependencies[] = array(
+		'slug' => 'google-analytics-dashboard-for-wp',
+		'active' => is_plugin_active('google-analytics-dashboard-for-wp/gadwp.php'),
+		'info' => array(),
+	);
+	$dependencies[] = array(
+		'slug' => 'cache-enabler',
+		'active' => is_plugin_active('cache-enabler/cache-enabler.php'),
+		'info' => array(),
+	);
+	$dependencies[] = array(
+		'slug' => 'simply-show-hooks',
+		'active' => is_plugin_active('simply-show-hooks/simply-show-hooks.php'),
+		'info' => array(),
+	);
+	$dependencies[] = array(
+		'slug' => 'what-the-file',
+		'active' => is_plugin_active('what-the-file/what-the-file.php'),
+		'info' => array(),
+	);
+	$dependencies[] = array(
+		'slug' => 'wordpress-seo',
+		'active' => is_plugin_active('wordpress-seo/wordpress-seo.php'),
+		'info' => array(),
+	);
+	$dependencies[] = array(
+		'slug' => 'ml-slider',
+		'active' => is_plugin_active('ml-slider/ml-slider.php'),
+		'info' => array(),
+	);
+
+	include ABSPATH . 'wp-admin/includes/plugin-install.php';
+	foreach($dependencies as $i=>$dependency) {
+		$plugin  = plugins_api('plugin_information', array(
+			'fields' => array(
+				'banners' => true,
+				'reviews' => false,
+				'downloaded' => false,
+				'active_installs' => false,
+				'installed_plugins' => true,
+			),
+			'slug' => $dependency['slug'],
+		));
+		$plugin->active = $dependency['active'];
+		$dependencies[$i] = $plugin;
+	}
+
+	return $dependencies;
+}
+
+
+
 function cdz_header() { ?>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css">
