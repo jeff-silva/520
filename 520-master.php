@@ -199,6 +199,7 @@ function cdz_update() {
 
 	// Delete zip
 	unlink(__DIR__ . '/_download.zip');
+	cdz_option_update('update_last', time());
 	cdz_option_update('update_time', (time() + (60*60*24)));
 
 	return $return? true: false;
@@ -244,19 +245,13 @@ foreach(cdz_modules() as $mod) {
 include_once __DIR__ . '/Cdz/init.php';
 
 
+// Update if need
 add_action('wp_login', function() {
-	$json1 = json_decode(helper_content(__DIR__ . '/info.json'), true);
-	$json2 = json_decode(helper_content('https://raw.githubusercontent.com/jeff-silva/520/master/info.json'), true);
-	if ($json1['version'] != $json2['version']) {
+	if (cdz_need_update()) {
 		cdz_update();
 	}
 });
 
-
-/*add_action('520-settings', function() {
-	cdz_tab('Aaa', function() { ?>
-	<?php });
-});*/
 
 add_action('admin_menu', function() {
 	add_submenu_page('options-general.php', '520 Settings', '520 Settings', 'manage_options', '520-settings', function() {
@@ -290,57 +285,6 @@ add_action('admin_menu', function() {
 	});
 });
 
-
-add_action('init', function() {
-	if (isset($_GET['520-action'])) {
-		$json = array('success'=>false, 'error'=>false);
-		$params = explode('.', $_GET['520-action']);
-		if (sizeof($params)>=3) {
-			$class[] = array_shift($params);
-			$class[] = array_shift($params);
-			$class = implode('\\', $class);
-			$method = 'api' . ucfirst(array_shift($params));
-			$call = array($class, $method);
-			if (is_callable($call)) {
-				$class = new $class();
-				$call = array($class, $method);
-				try {
-					$json['success'] = call_user_func_array($call, $params);
-				}
-				catch(\Exception $e) {
-					$json['error'] = $e->getMessage();
-				}
-			}
-		}
-		else {
-			$json['error'] = 'Parâmetros insuficientes';
-		}
-
-		die(json_encode($json));
-	}
-
-
-
-	if (isset($_GET['search_post'])) {
-		$posts = get_posts(array(
-			'post_type' => 'any',
-			's' => $_GET['search_post'],
-		));
-		echo json_encode($posts); die;
-	}
-
-
-	// Automatic update
-	if ($update_time = cdz_option('update_time')) {
-		if (time() > $update_time) {
-			cdz_update();
-		}
-	}
-	else {
-		cdz_option_update('update_time', (time() + (60*60*24)));
-	}
-
-});
 
 
 if (cdz_option('post_search_active')==1) {
@@ -410,46 +354,6 @@ add_action('save_post', function() {
 	}
 }, 10, 2);
 
-
-
-
-//wp-admin/admin-ajax.php?action=520&call=Test.Aaa.search
-helper_ajax('520', function() {
-	$params = explode('.', (isset($_GET['call'])? $_GET['call']: null));
-
-	$call = array();
-	$call[] = array_shift($params);
-	$call[] = array_shift($params);
-	$method = 'api'. ucfirst(array_shift($params));
-
-	
-	if ($include = realpath(__DIR__ .'/'. implode('/', $call) .'.php')) {
-		$class = implode('\\', $call);
-		$class = new $class();
-		$call = array($class, $method);
-		if (is_callable($call)) {
-			$error = false;
-			$success = call_user_func_array($call, $params);
-			if (property_exists($call[0], 'error')) {
-				if (is_array($call[0]->error) AND !empty($call[0]->error)) {
-					$error = $call[0]->error;
-					$success = false;
-				}
-				else if (is_string($call[0]->error) AND $call[0]->error) {
-					$error = array($call[0]->error);
-					$success = false;
-				}
-			}
-
-			$data = array('success' => $success, 'error' => $error);
-
-			$output = isset($_REQUEST['output'])? $_REQUEST['output']: 'json';
-			if ($output=='pre') { dd($data); }
-			else { echo json_encode($data); }
-			die;
-		}
-	}
-});
 
 
 add_shortcode('collection', function($atts=null, $content=null) {
