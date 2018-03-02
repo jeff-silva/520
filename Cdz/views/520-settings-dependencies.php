@@ -3,54 +3,10 @@
 add_action('520-settings', function() {
 	
 	/* Dependencies tab */
-	cdz_tab('Dependências', function() {
-
-		$dependencies[] = array(
-			'slug' => 'google-analytics-dashboard-for-wp',
-			'active' => is_plugin_active('google-analytics-dashboard-for-wp/gadwp.php'),
-		);
-		$dependencies[] = array(
-			'slug' => 'cache-enabler',
-			'active' => is_plugin_active('cache-enabler/cache-enabler.php'),
-		);
-		$dependencies[] = array(
-			'slug' => 'simply-show-hooks',
-			'active' => is_plugin_active('simply-show-hooks/simply-show-hooks.php'),
-		);
-		$dependencies[] = array(
-			'slug' => 'what-the-file',
-			'active' => is_plugin_active('what-the-file/what-the-file.php'),
-		);
-		$dependencies[] = array(
-			'slug' => 'wordpress-seo',
-			'active' => is_plugin_active('wordpress-seo/wordpress-seo.php'),
-		);
-		$dependencies[] = array(
-			'slug' => 'ml-slider',
-			'active' => is_plugin_active('ml-slider/ml-slider.php'),
-		);
-		
-		include ABSPATH . 'wp-admin/includes/plugin-install.php';
-
-		foreach($dependencies as $dependency) {
-			$plugin  = plugins_api('plugin_information', array(
-				'fields' => array(
-					'banners' => true,
-					'reviews' => true,
-					'downloaded' => false,
-					'active_installs' => true,
-					'installed_plugins' => true,
-				),
-				'slug' => $dependency['slug'],
-			));
-			$plugin->active = $dependency['active'];
-			$plugins[] = $plugin;
-		}
-
-	?>
+	cdz_tab('Dependências', function() { ?>
 
 	<div class="row">
-		<?php foreach($plugins as $i=>$plugin): ?>
+		<?php foreach(cdz_dependencies() as $i=>$plugin): ?>
 		<div class="col-xs-4 plugins-each <?php echo "plugins-each-{$i}"; ?>">
 			
 			<div class="popup plugin-each-modal-images <?php echo "plugin-each-modal-images-{$i}"; ?>">
