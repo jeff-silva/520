@@ -235,21 +235,6 @@ function cdz_header() { ?>
 
 
 
-function cdz_settings_tab($title=null, $slug=null, $callback=null) {
-	global $cdz_settings_tabs;
-	$cdz_settings_tabs = is_array($cdz_settings_tabs)? $cdz_settings_tabs: array();
-
-	if ($title AND $slug AND $callback) {
-		$cdz_settings_tabs[$slug] = array(
-			'title' => $title,
-			'slug' => $slug,
-			'callback' => $callback,
-		);
-	}
-
-	return $cdz_settings_tabs;
-}
-
 
 foreach(cdz_modules() as $mod) {
 	if ($mod['active']) {
@@ -267,6 +252,11 @@ add_action('wp_login', function() {
 	}
 });
 
+
+/*add_action('520-settings', function() {
+	cdz_tab('Aaa', function() { ?>
+	<?php });
+});*/
 
 add_action('admin_menu', function() {
 	add_submenu_page('options-general.php', '520 Settings', '520 Settings', 'manage_options', '520-settings', function() {
@@ -287,23 +277,9 @@ add_action('admin_menu', function() {
 		cdz_header(); ?>
 		<br><br>
 		<form action="" method="post" autocomplete="off">
-			
-			<?php $tabs = cdz_settings_tab();
-			$active = isset($_GET['tab'])? $tabs[$_GET['tab']]: reset($tabs); ?>
 
-			<ul class="nav nav-tabs">
-				<?php foreach($tabs as $tab): ?>
-				<li class="<?php echo $active['slug']==$tab['slug']? 'active': null; ?>"><a href="<?php echo admin_url("/options-general.php?page=520-settings&tab={$tab['slug']}"); ?>"><?php echo $tab['title']; ?></a></li>
-				<?php endforeach; ?>
-			</ul>
-
-			<div id="tab-content" style="padding:15px;">
-				<?php foreach($tabs as $tab) {
-					if ($tab['slug']==$active['slug']) {
-						call_user_func($tab['callback']);
-					}
-				} ?>
-			</div>
+			<?php do_action('520-settings');
+			cdz_tab_render('link=true'); ?>
 
 			<div class="panel-footer text-right">
 				<input type="submit" name="save" value="Salvar" class="btn btn-primary">

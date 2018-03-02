@@ -1,5 +1,8 @@
 <?php
 
-cdz_settings_tab('Code', '520-settings-code', function() {
-	include __DIR__ . '/views/520-settings-code.php';
+
+add_action('520-settings', function() {
+	cdz_tab('Code', function() {
+		include __DIR__ . '/views/520-settings-code.php';
+	});
 });

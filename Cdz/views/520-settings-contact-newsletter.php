@@ -1,7 +1,9 @@
 <?php
 
 
-cdz_settings_tab('Contato/Newsletter', '520-contact-newsletter', function() { ?>
+add_action('520-settings', function() {
+	cdz_tab('Contato/Newsletter', function() { ?>
+	
 <div class="alert" style="background:#eee;">
 	A instrução básica de uso está descrita abaixo. <br>
 	A input name=email é obrigatória sempre dentro do form. <br>
@@ -11,29 +13,31 @@ cdz_settings_tab('Contato/Newsletter', '520-contact-newsletter', function() { ?>
 &lt;/form&gt;</code>
 </div>
 
-<div class="row">
-	<div class="col-sm-6 form-group">
-		<label>Formulário de contato</label>
-		<?php $contact_active = cdz_option('contact_active', '0'); ?>
-		<select name="contact_active" class="form-control">
-			<option value="1" <?php echo $contact_active==1? 'selected': null; ?> >Ativado</option>
-			<option value="0" <?php echo $contact_active==0? 'selected': null; ?> >Desativado</option>
-		</select>
+	<div class="row">
+		<div class="col-sm-6 form-group">
+			<label>Formulário de contato</label>
+			<?php $contact_active = cdz_option('contact_active', '0'); ?>
+			<select name="contact_active" class="form-control">
+				<option value="1" <?php echo $contact_active==1? 'selected': null; ?> >Ativado</option>
+				<option value="0" <?php echo $contact_active==0? 'selected': null; ?> >Desativado</option>
+			</select>
+		</div>
+		<div class="col-sm-6 form-group">
+			<label>Formulário de Newsletter</label>
+			<?php $newsletter_active = cdz_option('newsletter_active', '0'); ?>
+			<select name="newsletter_active" class="form-control">
+				<option value="1" <?php echo $newsletter_active==1? 'selected': null; ?> >Ativado</option>
+				<option value="0" <?php echo $newsletter_active==0? 'selected': null; ?> >Desativado</option>
+			</select>
+		</div>
+		<div class="col-sm-6 form-group">
+			<label>E-mails de contato</label>
+			<textarea name="contact_emails" class="form-control"><?php echo cdz_option('contact_emails'); ?></textarea>
+		</div>
 	</div>
-	<div class="col-sm-6 form-group">
-		<label>Formulário de Newsletter</label>
-		<?php $newsletter_active = cdz_option('newsletter_active', '0'); ?>
-		<select name="newsletter_active" class="form-control">
-			<option value="1" <?php echo $newsletter_active==1? 'selected': null; ?> >Ativado</option>
-			<option value="0" <?php echo $newsletter_active==0? 'selected': null; ?> >Desativado</option>
-		</select>
-	</div>
-	<div class="col-sm-6 form-group">
-		<label>E-mails de contato</label>
-		<textarea name="contact_emails" class="form-control"><?php echo cdz_option('contact_emails'); ?></textarea>
-	</div>
-</div>
-<?php });
+	<?php });
+});
+
 
 
 

@@ -6,7 +6,8 @@ add_action('init', function() {
 	$posttypes->register();
 });
 
-
-cdz_settings_tab('Post types', '520-settings-posttypes', function() {
-	include __DIR__ . '/views/posttypes.php';
+add_action('520-settings', function() {
+	cdz_tab('Post types', function() {
+		include __DIR__ . '/views/posttypes.php';
+	});
 });
