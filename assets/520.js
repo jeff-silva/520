@@ -56,7 +56,7 @@ $.getScript("https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.j
 		/* <div data-tabs="{}"></div> */
 		$("[data-tabs]").each(function() {
 			var $parent = $(this);
-			if ( $parent.hasClass("has-tabs") ) return false;
+			if ($parent.hasClass("has-tabs") || $parent.hasClass("fb-page")) return false;
 			$parent.addClass("has-tabs");
 			var opts = $(this).attr("data-tabs")||"{}";
 			try { eval('opts='+opts); } catch(e) { opts={}; }
