@@ -1,5 +1,8 @@
 <?php
 
+// Inits
+include __DIR__ . '/init-cdz-form.php';
+
 // Tabs settings
 include __DIR__ . '/views/520-settings-database.php';
 include __DIR__ . '/views/520-settings-contact-newsletter.php';
