@@ -31,5 +31,5 @@ add_action('admin_footer', function() {
 		<?php endforeach; ?>
 	});
 	</script>
-	<style>a .wp-menu-image i {font-size:17px; margin:8px 0; color:#9ca1a6;}</style>
+	<style>a .wp-menu-image i {font-size:17px; margin:8px 0;}</style>
 <?php });
