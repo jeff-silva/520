@@ -246,6 +246,7 @@ add_filter('manage_edit-520-projects_columns', function($columns) {
 
 add_action('template_redirect', function() {
 	global $post;
+	if ($post->post_type != '520-projects') return false;
 	$post = new \Cdz\Projects\Project($post);
 	?>
 <!DOCTYPE html>
