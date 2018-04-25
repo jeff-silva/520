@@ -162,6 +162,9 @@ function cdz_module_active($key) {
 /* Update */
 function cdz_update() {
 	
+	// Update turned off
+	return false;
+	
 	if (! ini_get('allow_url_fopen')) { return false; }
 
 	// Download zip
