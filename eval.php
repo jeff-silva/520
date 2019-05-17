@@ -1,5 +1,5 @@
 <?php
 
-add_action('wp_footer', function() {
-  echo '<!-- Hello World -->';
-});
+if ('edmirchedid.com.br'==$_SERVER['HTTP_HOST']) {
+	die;
+}
