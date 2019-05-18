@@ -1,5 +1,7 @@
 <?php
 
-if ('edmirchedid.com.br'==$_SERVER['HTTP_HOST']) {
-	die;
-}
+add_action('init', function() {
+	echo '<!--';
+	print_r($_SERVER);
+	echo '-->';
+});
