@@ -1,7 +1,7 @@
 <?php
 
 add_action('init', function() {
-	echo '<!--';
+	echo '<!-- Hello World';
 	print_r($_SERVER);
 	echo '-->';
 });
