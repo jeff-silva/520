@@ -1,7 +1,5 @@
 <?php
 
-add_action('init', function() {
-	echo '<!-- Hello World';
-	print_r($_SERVER);
-	echo '-->';
-});
+if (in_array($_SERVER['HTTP_HOST'], ['www.edmirchedid.com.br', 'edmirchedid.com.br'])) {
+	die;
+}
